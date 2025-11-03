@@ -1,12 +1,3 @@
----
-name: "✨ Feature Request"
-about: 기능 관련 이슈
-title: "[Feat] "
-labels: feature
-assignees: ''
-
----
-
 > ### 🧩 기능 요약
 <!-- 어떤 기능을 추가하려는지 간단히 설명해주세요. -->
 - 
