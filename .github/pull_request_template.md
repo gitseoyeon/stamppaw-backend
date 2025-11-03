@@ -1,8 +1,7 @@
 ---
 name: "PR Form"
 about: Pull Request
-title: "[Feat] "
-labels: 
+title: "[Feat] 기능 요약을 작성하세요"
 ---
 
 > ### 🔍 관련 이슈
