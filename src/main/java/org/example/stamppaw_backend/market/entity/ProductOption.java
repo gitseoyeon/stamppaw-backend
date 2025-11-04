@@ -1,13 +1,10 @@
 package org.example.stamppaw_backend.market.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.example.stamppaw_backend.common.BasicTimeEntity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "product_options",
@@ -19,10 +16,11 @@ import java.time.LocalDateTime;
                 @Index(name="idx_product_options_product", columnList="product_id")
         })
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductOption {
+public class ProductOption extends BasicTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,9 +38,5 @@ public class ProductOption {
     @Column(name="extra_price", precision = 18, scale = 2, nullable = false)
     private BigDecimal extraPrice = BigDecimal.ZERO;
 
-    @Column(name="created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist void prePersist(){ createdAt = LocalDateTime.now(); }
 }
 

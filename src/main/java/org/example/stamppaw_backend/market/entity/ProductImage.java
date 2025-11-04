@@ -2,24 +2,21 @@ package org.example.stamppaw_backend.market.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.example.stamppaw_backend.common.BasicTimeEntity;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "product_images",
         indexes = {
-                @Index(name="idx_product_images_product", columnList="product_id"),
-                @Index(name="idx_product_images_is_main", columnList="product_id,is_main")
+                @Index(name="idx_product_images_product", columnList="product_id")
         })
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductImage {
+public class ProductImage extends BasicTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,8 +34,4 @@ public class ProductImage {
     @Builder.Default
     private Integer sort = 0;
 
-    @Column(name="created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist void prePersist(){ createdAt = LocalDateTime.now(); }
 }

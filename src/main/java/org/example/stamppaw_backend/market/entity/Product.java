@@ -2,27 +2,24 @@ package org.example.stamppaw_backend.market.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.example.stamppaw_backend.common.BasicTimeEntity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "products",
         indexes = {
-                @Index(name="idx_products_status", columnList="status"),
-                @Index(name="idx_products_created_at", columnList="created_at")
+                @Index(name="idx_products_status", columnList="status")
         })
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product {
+public class Product extends BasicTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,10 +43,6 @@ public class Product {
     @Builder.Default
     private ProductStatus status = ProductStatus.READY;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -64,9 +57,5 @@ public class Product {
     public void addImage(ProductImage img){ img.setProduct(this); images.add(img); }
     public void addOption(ProductOption opt){ opt.setProduct(this); options.add(opt); }
 
-    @PrePersist void prePersist(){
-        if (status == null) status = ProductStatus.READY; // 기본값 보장(선택)
-        createdAt = LocalDateTime.now();
-    }
 }
 

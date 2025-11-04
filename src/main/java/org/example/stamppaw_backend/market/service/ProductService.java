@@ -73,7 +73,7 @@ public class ProductService {
     }
 
     public Page<Product> getProducts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
         return productRepository.findAll(pageable);
     }
 }
