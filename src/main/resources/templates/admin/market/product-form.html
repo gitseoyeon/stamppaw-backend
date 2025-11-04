@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      th:replace="~{admin/layout :: layout('상품 등록', ~{::content})}">
+<body>
+<div th:fragment="content">
+
+  <div class="page-header">
+    <h2>상품 등록</h2>
+  </div>
+
+  <form th:action="@{/admin/products}" th:object="${form}" method="post" class="admin-form">
+    <!-- 에러 요약: 필드명 + 메시지 출력 -->
+    <div th:if="${#fields.hasErrors('*')}" class="form-error">
+      <strong>입력값을 확인하세요.</strong>
+      <ul class="error-list">
+        <li th:each="err : ${#fields.detailedErrors()}">
+          <span class="error-field" th:text="${err.fieldName != null ? err.fieldName : 'global'}"></span>
+          :
+          <span class="error-msg" th:text="${err.message}"></span>
+        </li>
+      </ul>
+    </div>
+
+
+    <!-- 기본 정보 -->
+    <section class="card">
+      <div class="grid-2">
+        <div>
+          <label>카테고리</label>
+          <select th:field="*{category}" required>
+            <!--option value="" disabled selected>선택</option-->
+            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"></option>
+          </select>
+          <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="err"></div>
+        </div>
+
+        <div>
+          <label>상태</label>
+          <select th:field="*{status}">
+            <!--option value="" selected>자동(기본값)</option-->
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+          </select>
+        </div>
+
+        <div>
+          <label>상품명</label>
+          <input type="text" th:field="*{name}" placeholder="예) 산책 미션 패스" required/>
+          <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="err"></div>
+        </div>
+
+        <div>
+          <label>가격</label>
+          <input type="number" step="0.01" th:field="*{price}" placeholder="0.00" required/>
+          <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="err"></div>
+        </div>
+
+        <div class="col-span-2">
+          <label>설명</label>
+          <textarea th:field="*{description}" rows="3" placeholder="상품 설명을 입력하세요"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 이미지: 고정 (loop) -->
+    <section class="card">
+      <div class="section-title">
+        <h3>이미지</h3>
+        <span class="hint">설명</span>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+        <tr><th>URL</th><th>대표</th><th>정렬</th><th>업로드</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${#numbers.sequence(0,2)}">
+          <td>
+            <input type="text" th:field="*{images[__${i}__].imageUrl}" placeholder="https://..."/>
+          </td>
+          <td>
+            <input type="checkbox" th:field="*{images[__${i}__].isMain}"/>
+          </td>
+          <td>
+            <input type="number" th:field="*{images[__${i}__].sort}" min="0" th:value="${i}"/>
+          </td>
+          <td class="upload-cell">
+            <!-- 향후 S3 연동 대비: 파일 입력 숨기고 버튼으로 트리거 -->
+            <input class="file-input" type="file"
+                   th:id="${'imageFile' + i}"
+                   th:name="${'imageFiles[' + i + ']'}"
+                   accept="image/*">
+            <label class="btn-secondary btn-small"
+                   th:for="${'imageFile' + i}">이미지 선택</label>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 옵션: 5개 고정 (loop) -->
+    <section class="card">
+      <div class="section-title">
+        <h3>옵션</h3>
+        <span class="hint">
+          값 여러 개는 <strong>쉼표(,)</strong>로 구분하세요. 예) <code>S,M,L,XL</code> / <code>Orange,Green,Blue</code>
+        </span>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+        <tr><th>이름</th><th>값 (쉼표로 구분)</th><th>추가금</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${#numbers.sequence(0,2)}">
+          <td><input type="text" th:field="*{options[__${i}__].name}" placeholder="SIZE"/></td>
+          <td><input type="text" th:field="*{options[__${i}__].value}" placeholder="S,M,L,XL"/></td>
+          <td><input type="number" step="0.01" th:field="*{options[__${i}__].extraPrice}" min="0" value="0"/></td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 액션 -->
+    <div class="actions">
+      <button type="submit" class="btn-primary btn-lg">등록</button>
+      <a th:href="@{/admin/products}" class="btn-secondary btn-lg">취소</a>
+    </div>
+  </form>
+
+</div>
+</body>
+</html>
