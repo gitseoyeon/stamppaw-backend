@@ -10,6 +10,7 @@ import org.example.stamppaw_backend.market.entity.ProductImage;
 import org.example.stamppaw_backend.market.entity.ProductOption;
 import org.example.stamppaw_backend.market.entity.ProductStatus;
 import org.example.stamppaw_backend.market.repository.ProductRepository;
+import org.example.stamppaw_backend.market.repository.projection.ProductListRow;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -75,31 +76,32 @@ public class ProductService {
         return productRepository.save(p).getId();
     }
 
+    public Page<ProductListResponse> getAdminList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-    //관리자 전체 목록 (status 상관 없음) - //로그인, 관리자 권한 체크
-    public Page<Product> getAllProductsForAdmin(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
-        return productRepository.findAll(pageable);
+        return productRepository.findAllForAdmin(pageable)
+                .map(ProductListResponse::fromRow);
     }
 
-    //프런트 전체 목록 (SERVICE 상태만) - 비로그인
-    public Page<Product> getAllProductsForFront(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
-        return productRepository.findByStatus(ProductStatus.SERVICE, pageable);
+    // 관리자용 상품 검색 : 상태 필터 없이 전체 조회 + 검색 가능
+    public Page<ProductListRow> getProductSearchForAdmin(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        // 검색어 없으면 null 넣으면 자동 필터 제거
+        String keyword = (name == null || name.isBlank()) ? null : name;
+
+        return productRepository.findList(keyword, pageable);
     }
 
-    //관리자 검색 (status 상관 없음) - //로그인, 관리자 권한 체크
-    public Page<Product> searchProductsForAdmin(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
-        return productRepository.findByNameContainingIgnoreCase(keyword, pageable);
-    }
+    // 프런트용 상품 검색 :  status = SERVICE 인 상품만 대상 + 검색 가능
+    public Page<ProductListRow> getProductSearchForFront(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-    //프런트 검색 (status = SERVICE) - 비로그인
-    public Page<Product> searchProductsForFront(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
-        return productRepository.findByNameContainingIgnoreCaseAndStatus(
-                keyword,
+        String keyword = (name == null || name.isBlank()) ? null : name;
+
+        return productRepository.findListByStatusAndName(
                 ProductStatus.SERVICE,
+                keyword,
                 pageable
         );
     }

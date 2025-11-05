@@ -3,9 +3,11 @@ package org.example.stamppaw_backend.admin.market.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.admin.market.dto.request.ProductCreateRequest;
+import org.example.stamppaw_backend.market.dto.response.ProductListResponse;
 import org.example.stamppaw_backend.market.entity.Category;
 import org.example.stamppaw_backend.market.entity.Product;
 import org.example.stamppaw_backend.market.entity.ProductStatus;
+import org.example.stamppaw_backend.market.repository.projection.ProductListRow;
 import org.example.stamppaw_backend.market.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -56,9 +58,9 @@ public class AdminProductController {
     public String listProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            Model model) {
-
-        Page<Product> products = productService.getAllProductsForAdmin(page, size);
+            Model model)
+    {
+        Page<ProductListResponse> products = productService.getAdminList(page, size);
 
         model.addAttribute("products", products.getContent());
         model.addAttribute("currentPage", page);
@@ -66,5 +68,14 @@ public class AdminProductController {
         model.addAttribute("title", "상품 목록");
 
         return "admin/market/product-list";
+    }
+
+    @GetMapping("/search")
+    public Page<ProductListRow> getProductListAdmin(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        return productService.getProductSearchForAdmin(keyword, page, size);
     }
 }
