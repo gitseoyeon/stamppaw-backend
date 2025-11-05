@@ -42,7 +42,6 @@ public class AdminProductController {
         return "redirect:/admin/products";
     }
 
-    /** 폼에 공통으로 내려줄 enum 목록 */
     @ModelAttribute("categories")
     public Category[] categories() {
         return Category.values();
@@ -59,7 +58,7 @@ public class AdminProductController {
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        Page<Product> products = productService.getProducts(page, size);
+        Page<Product> products = productService.getAllProductsForAdmin(page, size);
 
         model.addAttribute("products", products.getContent());
         model.addAttribute("currentPage", page);

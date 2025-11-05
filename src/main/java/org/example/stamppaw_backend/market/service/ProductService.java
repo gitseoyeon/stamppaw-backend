@@ -3,6 +3,8 @@ package org.example.stamppaw_backend.market.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.admin.market.dto.request.ProductCreateRequest;
+import org.example.stamppaw_backend.market.dto.request.ProductSearchRequest;
+import org.example.stamppaw_backend.market.dto.response.ProductListResponse;
 import org.example.stamppaw_backend.market.entity.Product;
 import org.example.stamppaw_backend.market.entity.ProductImage;
 import org.example.stamppaw_backend.market.entity.ProductOption;
@@ -21,6 +23,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public Long createProduct(ProductCreateRequest req) {
+        //로그인, 관리자 권한 체크
 
         Product p = new Product();
         p.setCategory(req.getCategory());
@@ -72,9 +75,34 @@ public class ProductService {
         return productRepository.save(p).getId();
     }
 
-    public Page<Product> getProducts(int page, int size) {
+
+    //관리자 전체 목록 (status 상관 없음) - //로그인, 관리자 권한 체크
+    public Page<Product> getAllProductsForAdmin(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
         return productRepository.findAll(pageable);
     }
+
+    //프런트 전체 목록 (SERVICE 상태만) - 비로그인
+    public Page<Product> getAllProductsForFront(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
+        return productRepository.findByStatus(ProductStatus.SERVICE, pageable);
+    }
+
+    //관리자 검색 (status 상관 없음) - //로그인, 관리자 권한 체크
+    public Page<Product> searchProductsForAdmin(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
+        return productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+    }
+
+    //프런트 검색 (status = SERVICE) - 비로그인
+    public Page<Product> searchProductsForFront(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
+        return productRepository.findByNameContainingIgnoreCaseAndStatus(
+                keyword,
+                ProductStatus.SERVICE,
+                pageable
+        );
+    }
+
 }
 

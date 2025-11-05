@@ -1,6 +1,7 @@
 package org.example.stamppaw_backend.market.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.stamppaw_backend.common.BasicTimeEntity;
@@ -43,14 +44,17 @@ public class Product extends BasicTimeEntity {
     @Builder.Default
     private ProductStatus status = ProductStatus.READY;
 
-
+    @ToString.Exclude
+    @JsonManagedReference("product-images")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sort ASC, id ASC")
     private List<ProductImage> images = new ArrayList<>();
 
+    @ToString.Exclude
+    @JsonManagedReference("product-options")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductOption> options = new ArrayList<>();
 
     // 연관관계 편의 메서드
