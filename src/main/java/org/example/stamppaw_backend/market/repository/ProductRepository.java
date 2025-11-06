@@ -1,6 +1,8 @@
 package org.example.stamppaw_backend.market.repository;
 
+import org.example.stamppaw_backend.market.entity.Category;
 import org.example.stamppaw_backend.market.entity.Product;
+import org.example.stamppaw_backend.market.entity.ProductStatus;
 import org.example.stamppaw_backend.market.repository.projection.ProductListRow;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -85,6 +88,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
        """)
     Page<ProductListRow> findServiceListByName(@Param("pattern") String pattern, Pageable pageable);
 
+    @Query("""
+    select p.id as id,
+           p.name as name,
+           p.category as category,
+           p.status as status,
+           p.price as price,
+           i.imageUrl as mainImageUrl
+    from Product p
+    left join ProductImage i on i.product = p and i.isMain = true
+    where p.category = :category and p.status = :status
+    order by p.id desc
+    """)
+    List<ProductListRow> findListByCategoryAndStatus(Category category, ProductStatus status);
 
 
 }

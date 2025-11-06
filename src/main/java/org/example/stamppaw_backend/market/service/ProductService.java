@@ -6,10 +6,7 @@ import org.example.stamppaw_backend.admin.market.dto.request.ProductCreateReques
 import org.example.stamppaw_backend.common.S3Service;
 import org.example.stamppaw_backend.market.dto.response.ProductDetailResponse;
 import org.example.stamppaw_backend.market.dto.response.ProductListResponse;
-import org.example.stamppaw_backend.market.entity.Product;
-import org.example.stamppaw_backend.market.entity.ProductImage;
-import org.example.stamppaw_backend.market.entity.ProductOption;
-import org.example.stamppaw_backend.market.entity.ProductStatus;
+import org.example.stamppaw_backend.market.entity.*;
 import org.example.stamppaw_backend.market.repository.ProductRepository;
 import org.example.stamppaw_backend.market.repository.projection.ProductListRow;
 import org.springframework.data.domain.*;
@@ -114,7 +111,23 @@ public class ProductService {
         return productRepository.findServiceListByName(pattern, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public ProductDetailResponse getProductDetail(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. id=" + id));
 
+        return ProductDetailResponse.fromEntity(product);
+    }
+
+    public List<ProductListResponse> getProductsByCategory(Category category) {
+
+        ProductStatus activeStatus = ProductStatus.SERVICE;
+
+        return productRepository.findListByCategoryAndStatus(category, activeStatus)
+                .stream()
+                .map(ProductListResponse::fromRow)
+                .toList();
+    }
 
     @Transactional
     public void deleteProduct(Long productId) {
@@ -122,14 +135,6 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID=" + productId));
 
         productRepository.deleteById(productId);
-    }
-
-    @Transactional(readOnly = true)
-    public ProductDetailResponse getProductDetail(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. id=" + id));
-
-        return ProductDetailResponse.fromEntity(product);
     }
 
 }
