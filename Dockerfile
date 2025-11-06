@@ -1,8 +1,11 @@
-# jdk17 Image Start
 FROM eclipse-temurin:17-jdk
 
-# jar 파일 복제
-COPY ./build/libs/stamppaw_backend-0.0.1-SNAPSHOT.jar stamppaw_backend.jar
+# jar를 둘 디렉터리 생성
+WORKDIR /app
 
-# 실행 명령어
-ENTRYPOINT ["java", "-jar", "stamppaw_backend.jar"]
+# build/libs 아래 있는 jar 복사
+COPY ./build/libs/*.jar /app/stamppaw_backend.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "/app/stamppaw_backend.jar"]

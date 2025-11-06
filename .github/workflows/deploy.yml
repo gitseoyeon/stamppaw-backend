@@ -21,23 +21,35 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # ✅ application.yml은 빌드 전에 생성해야 함
       - name: Create application.yml
         run: |
           mkdir -p ./src/main/resources
-          echo '${{ secrets.APPLICATION }}' > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
 
-      - name: Debug application.yml
+      - name: Check application.yml path
         run: |
-          echo "===== application.yml in CI ====="
-          cat ./src/main/resources/application.yml
+          echo "===== Checking application.yml existence ====="
+          find . -name "application.yml" || echo "❌ application.yml not found!"
 
       - name: Build Spring Boot jar
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build -x test
+          ./gradlew clean --no-build-cache build -x test
 
-      - name: Check if application.yml exists
-        run: test -f ./src/main/resources/application.yml && echo "File exists" || echo "File does not exist"
+      - name: Verify built JAR
+        run: |
+          echo "📦 빌드된 JAR 확인 중..."
+          ls -lh build/libs
+          echo "🔍 PostgreSQL 드라이버 포함 여부:"
+          jar tf build/libs/*SNAPSHOT.jar | grep postgresql || echo "❌ PostgreSQL 드라이버 없음"
+          echo "🔍 Hibernate Driver 클래스 포함 여부:"
+          jar tf build/libs/*SNAPSHOT.jar | grep "org/postgresql/Driver.class" || echo "❌ Driver.class 없음"
+          echo "🔍 application.yml 반영 여부:"
+          jar tf build/libs/*SNAPSHOT.jar | grep application.yml || echo "❌ application.yml 누락됨"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -47,7 +59,12 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build --build-arg DEPENDENCY=build/dependency -t ${{ secrets.DOCKER_USERNAME }}/stamppaw --platform linux/amd64 .
+          echo "🐳 Docker 이미지 빌드 중..."
+          docker build --no-cache \
+            -t ${{ secrets.DOCKER_USERNAME }}/stamppaw:latest \
+            --platform linux/amd64 \
+            -f Dockerfile .
+          echo "🚀 Docker Hub 푸시 중..."
           docker push ${{ secrets.DOCKER_USERNAME }}/stamppaw:latest
 
       - name: Deploy via SSH to EC2

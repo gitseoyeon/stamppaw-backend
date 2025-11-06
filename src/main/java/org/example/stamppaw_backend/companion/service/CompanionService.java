@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.common.S3Service;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
+import org.example.stamppaw_backend.companion.dto.CompanionDto;
 import org.example.stamppaw_backend.companion.dto.request.CompanionCreateRequest;
+import org.example.stamppaw_backend.companion.dto.request.CompanionUpdateRequest;
 import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
 import org.example.stamppaw_backend.companion.entity.Companion;
 import org.example.stamppaw_backend.companion.repository.CompanionRepository;
@@ -46,9 +48,39 @@ public class CompanionService {
 
     @Transactional(readOnly = true)
     public CompanionResponse getCompanion(Long postId) {
-        Companion companion = companionRepository.findById(postId)
-                .orElseThrow(() -> new StampPawException(ErrorCode.COMPANION_NOT_FOUND));
+        Companion companion = getCompanionOrException(postId);
 
         return CompanionResponse.fromEntity(companion);
+    }
+
+    public CompanionResponse modifyCompanion(Long postId, Long userId, CompanionUpdateRequest request) {
+        User user = userService.getUserOrExcepion(userId);
+        Companion companion = getCompanionOrException(postId);
+        if(!user.getId().equals(companion.getUser().getId())) {
+            throw new StampPawException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+
+        return companion.updateCompanion(
+                CompanionDto.builder()
+                        .title(request.getTitle())
+                        .content(request.getContent())
+                        .image(s3Service.uploadFileAndGetUrl(request.getImage()))
+                        .build()
+        );
+    }
+
+    public void deleteCompanion(Long postId, Long userId) {
+        User user = userService.getUserOrExcepion(userId);
+        Companion companion = getCompanionOrException(postId);
+        if(!user.getId().equals(companion.getUser().getId())) {
+            throw new StampPawException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+
+        companionRepository.delete(companion);
+    }
+
+    private Companion getCompanionOrException(Long postId) {
+        return companionRepository.findById(postId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.COMPANION_NOT_FOUND));
     }
 }

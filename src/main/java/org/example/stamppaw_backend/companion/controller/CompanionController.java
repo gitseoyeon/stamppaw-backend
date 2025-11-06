@@ -3,6 +3,7 @@ package org.example.stamppaw_backend.companion.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.companion.dto.request.CompanionCreateRequest;
+import org.example.stamppaw_backend.companion.dto.request.CompanionUpdateRequest;
 import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
 import org.example.stamppaw_backend.companion.service.CompanionService;
 import org.example.stamppaw_backend.user.entity.User;
@@ -35,5 +36,18 @@ public class CompanionController {
     @GetMapping("/{postId}")
     public CompanionResponse getCompanion(@PathVariable Long postId) {
         return companionService.getCompanion(postId);
+    }
+
+    @PatchMapping("/{postId}")
+    public CompanionResponse modifyCompanion(@PathVariable Long postId,
+                                             @AuthenticationPrincipal User user,
+                                             @Valid CompanionUpdateRequest request) {
+        return companionService.modifyCompanion(postId, user.getId(), request);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deleteCompanion(@PathVariable Long postId, @AuthenticationPrincipal User user) {
+        companionService.deleteCompanion(postId, user.getId());
+        return ResponseEntity.ok("삭제가 완료되었습니다.");
     }
 }
