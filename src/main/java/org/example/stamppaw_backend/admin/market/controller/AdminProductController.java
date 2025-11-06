@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.admin.market.dto.request.ProductCreateRequest;
 import org.example.stamppaw_backend.market.dto.response.ProductListResponse;
 import org.example.stamppaw_backend.market.entity.Category;
-import org.example.stamppaw_backend.market.entity.Product;
 import org.example.stamppaw_backend.market.entity.ProductStatus;
 import org.example.stamppaw_backend.market.repository.projection.ProductListRow;
 import org.example.stamppaw_backend.market.service.ProductService;

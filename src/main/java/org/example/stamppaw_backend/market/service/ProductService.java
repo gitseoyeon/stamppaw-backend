@@ -45,7 +45,6 @@ public class ProductService {
             log.info("[ADMIN MARKET PRODUCT] 이미지 파일이 전달되지 않았습니다.");
         } else {
 
-            int idx = 0;
             boolean hasMain = false;
             for (int i = 0; i < imageFiles.size(); i++) {
                 MultipartFile file = imageFiles.get(i);
@@ -64,7 +63,6 @@ public class ProductService {
                 img.setSort(i);
                 p.addImage(img);
 
-                idx++;
             }
         }
 
