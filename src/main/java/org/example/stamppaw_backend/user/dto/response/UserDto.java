@@ -1,4 +1,4 @@
-package org.example.stamppaw_backend.user.dto;
+package org.example.stamppaw_backend.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

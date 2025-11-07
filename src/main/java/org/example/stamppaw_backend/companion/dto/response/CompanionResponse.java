@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.stamppaw_backend.companion.entity.Companion;
 import org.example.stamppaw_backend.companion.entity.RecruitmentStatus;
-import org.example.stamppaw_backend.user.dto.UserDto;
-import org.example.stamppaw_backend.user.entity.User;
+import org.example.stamppaw_backend.user.dto.response.UserDto;
 
 import java.time.LocalDateTime;
 
