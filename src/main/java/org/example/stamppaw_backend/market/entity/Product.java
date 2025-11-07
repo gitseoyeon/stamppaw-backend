@@ -1,6 +1,7 @@
 package org.example.stamppaw_backend.market.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.stamppaw_backend.common.BasicTimeEntity;
@@ -43,19 +44,33 @@ public class Product extends BasicTimeEntity {
     @Builder.Default
     private ProductStatus status = ProductStatus.READY;
 
-
+    @ToString.Exclude
+    @JsonManagedReference("product-images")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("sort ASC, id ASC")
     private List<ProductImage> images = new ArrayList<>();
 
+    @ToString.Exclude
+    @JsonManagedReference("product-options")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductOption> options = new ArrayList<>();
 
     // 연관관계 편의 메서드
     public void addImage(ProductImage img){ img.setProduct(this); images.add(img); }
     public void addOption(ProductOption opt){ opt.setProduct(this); options.add(opt); }
+
+    public String getMainImageUrl() {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+
+        return images.stream()
+                .filter(ProductImage::isMain)  // 대표 이미지 조건
+                .findFirst()
+                .map(ProductImage::getImageUrl)
+                .orElse(images.get(0).getImageUrl()); // 없으면 첫번째 이미지 반환
+    }
 
 }
 

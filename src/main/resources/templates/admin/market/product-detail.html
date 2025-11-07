@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      th:replace="~{admin/layout :: layout('상품 상세', ~{::content})}">
+<body>
+<div th:fragment="content">
+
+  <div class="page-header">
+    <h2>상품 상세</h2>
+  </div>
+
+  <div style="margin: 0px 15px;">
+  <section class="card">
+    <div class="grid-2">
+
+      <div>
+        <label>카테고리</label>
+        <span class="readonly-text" th:text="${product.category.label}"></span>
+      </div>
+
+      <div>
+        <label>상태</label>
+        <span class="readonly-text" th:text="${product.status}"></span>
+      </div>
+
+      <div>
+        <label>상품명</label>
+        <span class="readonly-text" th:text="${product.name}"></span>
+      </div>
+
+      <div>
+        <label>가격</label>
+        <span class="readonly-text" th:text="${product.price}"></span>
+      </div>
+
+      <div class="col-span-2">
+        <label>설명</label>
+        <div class="readonly-text multiline" th:text="${product.description}"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h3>이미지</h3>
+      <span class="hint">대표 이미지는 (대표) 표시</span>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+      <tr>
+        <th>이미지</th>
+        <th>대표</th>
+        <th>정렬</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="img : ${product.images}">
+        <td>
+          <img th:src="${img.imageUrl}" style="max-width:80px; border-radius:6px;"/>
+        </td>
+        <td th:text="${img.isMain ? '대표' : ''}"></td>
+        <td th:text="${img.sort}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h3>옵션</h3>
+      <span class="hint">여러 값은 쉼표 구분</span>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+      <tr><th>이름</th><th>값</th><th>추가금</th></tr>
+      </thead>
+      <tbody>
+      <tr th:each="opt : ${product.options}">
+        <td th:text="${opt.name}"></td>
+        <td th:text="${opt.value}"></td>
+        <td th:text="${opt.extraPrice}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="actions">
+    <a th:href="@{'/admin/products/' + ${product.id} + '/edit'}" class="btn-primary btn-lg">수정</a>
+
+    <form th:action="@{'/admin/products/' + ${product.id} + '/delete'}"
+          method="post"
+          style="display:inline;">
+      <button type="submit" class="btn-danger btn-lg"
+              onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+    </form>
+
+    <a th:href="@{/admin/products}" class="btn-secondary btn-lg">목록</a>
+  </div>
+  </div>
+</div>
+</body>
+</html>

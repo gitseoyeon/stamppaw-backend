@@ -1,12 +1,10 @@
-/* Base */
+
 body {
   font-family: "Pretendard", sans-serif;
   background-color: #fafafa;
-  margin: 0;
   padding: 0;
 }
 
-/* Header */
 .admin-header {
   background: #FFFDEB;
   display: flex;
@@ -22,7 +20,6 @@ body {
   font-weight: 400;
 }
 
-/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -38,7 +35,6 @@ body {
   font-weight: 600;
 }
 
-/* Page header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -46,7 +42,7 @@ body {
   padding: 15px;
 }
 
-/* Form */
+
 .admin-form {
   padding: 0 15px 24px 15px;
 }
@@ -56,7 +52,6 @@ body {
   margin: 0 0 16px;
 }
 
-/* Cards */
 .card {
   padding: 16px;
   background: #fff;
@@ -65,7 +60,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* Grid */
+
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -93,7 +88,7 @@ body {
   font-size: 12px;
 }
 
-/* Table */
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -111,7 +106,6 @@ body {
   min-width: 120px;
 }
 
-/* Buttons */
 .btn-primary,
 .btn-secondary {
   border: none;

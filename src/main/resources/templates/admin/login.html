@@ -3,24 +3,39 @@
 <head>
     <meta charset="UTF-8" />
     <title>관리자 로그인 | StampPaw Admin</title>
-    <link rel="stylesheet" th:href="@{/css/admin.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin-login.css}" />
 </head>
 <body class="login-page">
+
 <div class="login-container">
-    <h2>StampPaw 관리자 로그인</h2>
+    <div class="logo-box">
+        <img src="/images/stamppaw_logo.png" alt="StampPaw Logo" class="logo-img">
+        <h1 class="brand">Stamp<span>Paw</span></h1>
+    </div>
+
+    <h2>관리자 로그인</h2>
+
     <form th:action="@{/admin/login}" method="post">
         <div class="form-group">
             <label for="username">아이디</label>
             <input type="text" id="username" name="username" required />
         </div>
+
         <div class="form-group">
             <label for="password">비밀번호</label>
             <input type="password" id="password" name="password" required />
         </div>
+
         <button type="submit" class="btn-primary">로그인</button>
 
         <p th:if="${param.error}" class="error">아이디 또는 비밀번호가 잘못되었습니다.</p>
     </form>
+
 </div>
+
+<footer class="footer">
+    © 2025 StampPaw. All rights reserved.
+</footer>
+
 </body>
 </html>

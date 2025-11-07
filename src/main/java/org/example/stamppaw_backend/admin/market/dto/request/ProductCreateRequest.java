@@ -56,7 +56,7 @@ public class ProductCreateRequest {
         private Boolean isMain;
 
         @Builder.Default
-        private Integer sort = 0;
+        private Integer sort = 1;
     }
 
     @Getter @Setter

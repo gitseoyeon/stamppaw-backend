@@ -2,41 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko"
       th:replace="~{admin/layout :: layout('상품 목록', ~{::content})}">
 <body>
-<div th:fragment="content">
+<div th:fragment="content" >
 
   <div class="page-header">
     <h2>상품 목록</h2>
     <a th:href="@{/admin/products/new}" class="btn-primary btn-lg">상품 등록</a>
   </div>
 
-<table class="admin-table">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>상품명</th>
-    <th>상태</th>
-    <th>가격</th>
-    <th>등록일</th>
-    <th>관리</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="product : ${products}">
-    <td th:text="${product.id}"></td>
-    <td th:text="${product.name}"></td>
-    <td th:text="${product.status}"></td>
-    <td th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'"></td>
-    <td th:text="${#temporals.format(product.registeredAt, 'yyyy-MM-dd')}"></td>
-    <td>
-      <a th:href="@{/admin/market/products/{id}(id=${product.id})}">수정</a> |
-      <a th:href="@{/admin/market/products/delete/{id}(id=${product.id})}" onclick="return confirm('삭제하시겠습니까?')">삭제</a>
-    </td>
-  </tr>
-  <tr th:if="${#lists.isEmpty(products)}">
-    <td colspan="6" class="text-center">등록된 상품이 없습니다.</td>
-  </tr>
-  </tbody>
-</table>
+  <div style="margin: 0px 15px;">
+  <table class="admin-table">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>카테고리</th>
+      <th>상품명</th>
+      <th>상태</th>
+      <th>가격</th>
+      <th>대표이미지</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product : ${products}">
+      <td th:text="${product.id}"></td>
+      <td th:text="${product.category}"></td>
+      <td th:text="${product.name}"></td>
+      <td th:text="${product.status}"></td>
+      <td th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + ' 원'"></td>
+      <td>
+        <img th:src="${product.mainImageUrl}" style="max-width:80px; border-radius:6px;"/>
+      </td>
+      <td
+      >
+        <a th:href="@{'/admin/products/' + ${product.id}}" class="btn btn-sm btn-primary">상세보기</a>
+        <a th:href="@{/admin/market/products/{id}(id=${product.id})}">수정</a>
+
+        <form th:action="@{'/admin/products/' + ${product.id} + '/delete'}" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-primary" onclick="return confirm('정말 삭제하시겠습니까?');">
+            삭제
+          </button>
+        </form>
+
+
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(products)}">
+      <td colspan="6" class="text-center">등록된 상품이 없습니다.</td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
 </div>
 </body>
 </html>

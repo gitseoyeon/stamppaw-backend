@@ -1,6 +1,7 @@
 package org.example.stamppaw_backend.market.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.stamppaw_backend.common.BasicTimeEntity;
@@ -21,7 +22,9 @@ public class ProductImage extends BasicTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "product_id", nullable = false)
+    @JsonBackReference("product-images")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     // 스토리지 키 or URL 하나로 통일 권장 (둘 다 필요하면 명확히 역할 분리)
@@ -32,6 +35,6 @@ public class ProductImage extends BasicTimeEntity {
     private boolean isMain;
 
     @Builder.Default
-    private Integer sort = 0;
+    private Integer sort = 1;
 
 }
