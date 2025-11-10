@@ -33,10 +33,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/follows/**").authenticated()
-                .requestMatchers("/admin/**").permitAll()
-                .requestMatchers("/api/market/products/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/admin/**").permitAll() // 관리자 임시허용
+                .requestMatchers("/ws-stomp/**", "/ws-stomp").permitAll()
                 .anyRequest().authenticated()
             )
             // 인증 / 권한 예외 발생 시 JSON 응답 처리
