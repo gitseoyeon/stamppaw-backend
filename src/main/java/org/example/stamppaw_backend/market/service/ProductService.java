@@ -86,6 +86,7 @@ public class ProductService {
         return productRepository.save(p).getId();
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductListResponse> getListForAdmin(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -94,6 +95,7 @@ public class ProductService {
     }
 
     // 관리자용 상품 검색 : 상태 필터 없이 전체 조회 + 검색 가능
+    @Transactional(readOnly = true)
     public Page<ProductListRow> getProductSearchForAdmin(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -103,6 +105,7 @@ public class ProductService {
     }
 
     // 프런트용 상품 검색 :  status = SERVICE 인 상품만 대상 + 검색 가능
+    @Transactional(readOnly = true)
     public Page<ProductListRow> getProductSearch(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -121,6 +124,7 @@ public class ProductService {
         return ProductDetailResponse.fromEntity(product);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductListResponse> getProductsByCategory(Category category) {
 
         ProductStatus activeStatus = ProductStatus.SERVICE;

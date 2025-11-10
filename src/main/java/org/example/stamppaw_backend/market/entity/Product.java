@@ -33,7 +33,7 @@ public class Product extends BasicTimeEntity {
     @Column(length = 200, nullable = false)
     private String name;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(precision = 18, scale = 2, nullable = false)
