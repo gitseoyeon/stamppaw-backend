@@ -33,8 +33,7 @@ public class CartService {
     @Transactional
     public CartResponse getUserCart(Long userId) {
 
-        //User user = userService.getUserOrException(userId);
-        User user = userService.getUserOrExcepion(userId);
+        User user = userService.getUserOrException(userId);
 
         Cart cart = cartRepository.findByUserIdWithItems(userId)
                 .orElseGet(() -> cartRepository.save(
@@ -47,8 +46,7 @@ public class CartService {
     @Transactional
     public Cart createCartWithItems(CartCreateRequest request) {
 
-        //User user = userService.getUserOrException(request.getUserId());
-        User user = userService.getUserOrExcepion(request.getUserId());
+        User user = userService.getUserOrException(request.getUserId());
 
         // 장바구니 조회 or 생성
         Cart cart = cartRepository.findByUser(user)

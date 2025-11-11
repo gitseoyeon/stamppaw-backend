@@ -8,7 +8,7 @@
     <h2>상품 등록</h2>
   </div>
 
-  <form th:action="@{/admin/products/search}" th:object="${form}" method="post" enctype="multipart/form-data" class="admin-form">
+  <form th:action="@{/admin/products}" th:object="${form}" method="post" enctype="multipart/form-data" class="admin-form">
     <!-- 에러 요약: 필드명 + 메시지 출력 -->
     <div th:if="${#fields.hasErrors('*')}" class="form-error">
       <strong>입력값을 확인하세요.</strong>
