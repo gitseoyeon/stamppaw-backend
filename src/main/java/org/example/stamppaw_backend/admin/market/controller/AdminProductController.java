@@ -71,8 +71,8 @@ public class AdminProductController {
     {
         Page<ProductListResponse> products = productService.getListForAdmin(page, size);
 
-        model.addAttribute("products", products.getContent());
-        model.addAttribute("currentPage", page);
+        model.addAttribute("products", products);
+        model.addAttribute("currentPage", products.getNumber());
         model.addAttribute("totalPages", products.getTotalPages());
         model.addAttribute("title", "상품 목록");
 
@@ -88,8 +88,8 @@ public class AdminProductController {
     ) {
         Page<ProductListRow> products = productService.getProductSearchForAdmin(name, page, size);
 
-        model.addAttribute("products", products.getContent());
-        model.addAttribute("currentPage", page);
+        model.addAttribute("products", products);
+        model.addAttribute("currentPage", products.getNumber());
         model.addAttribute("totalPages", products.getTotalPages());
         model.addAttribute("name", name); //검색 정보 유지용
         model.addAttribute("title", "상품 검색 결과");

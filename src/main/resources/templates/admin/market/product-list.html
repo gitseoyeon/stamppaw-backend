@@ -29,7 +29,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="product : ${products}">
+    <tr th:each="product : ${products.content}">
       <td th:text="${product.id}"></td>
       <td th:text="${product.category}"></td>
       <td th:text="${product.name}"></td>
@@ -52,7 +52,7 @@
 
       </td>
     </tr>
-    <tr th:if="${#lists.isEmpty(products)}">
+    <tr th:if="${products.totalElements == 0}">
       <td colspan="7" class="text-center">등록된 상품이 없습니다.</td>
     </tr>
     </tbody>
@@ -60,8 +60,7 @@
   </div>
 
   <div class="pagination" style="text-align:center; margin-top: 20px;">
-    <!--/*
-    <a th:if="${products.hasPrevious()}"
+        <a th:if="${products.hasPrevious()}"
        th:href="@{/admin/products(page=${products.number - 1}, name=${name})}">이전</a>
 
     <span th:each="page : ${#numbers.sequence(0, products.totalPages - 1)}"
@@ -71,7 +70,7 @@
     </span>
 
     <a th:if="${products.hasNext()}"
-       th:href="@{/admin/products(page=${products.number + 1}, name=${name})}">다음</a> */-->
+       th:href="@{/admin/products(page=${products.number + 1}, name=${name})}">다음</a>
   </div>
 
 </div>
