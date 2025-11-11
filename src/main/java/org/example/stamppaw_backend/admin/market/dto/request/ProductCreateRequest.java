@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.example.stamppaw_backend.market.entity.Category;       // ← 실제 패키지에 맞게 수정
 import org.example.stamppaw_backend.market.entity.ProductStatus;  // ← 실제 패키지에 맞게 수정
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter @Setter
 @NoArgsConstructor
@@ -35,6 +36,10 @@ public class ProductCreateRequest {
     @NotNull
     private ProductStatus status;
 
+    @Size(max = 2048)
+    private String mainImageUrl;
+    private MultipartFile mainImageFile;
+
     @Valid
     @Builder.Default
     private List<ImageDto> images = new ArrayList<>();
@@ -49,11 +54,8 @@ public class ProductCreateRequest {
     @Builder
     public static class ImageDto {
 
-        //@NotBlank 스토리지 URL 또는 공개 URL
         @Size(max = 2048)
         private String imageUrl;
-
-        private Boolean isMain;
 
         @Builder.Default
         private Integer sort = 1;
@@ -65,11 +67,9 @@ public class ProductCreateRequest {
     @Builder
     public static class OptionDto {
 
-        //@NotBlank
         @Size(max = 100)
         private String name;
 
-       // @NotBlank
         @Size(max = 100)
         private String value;
 

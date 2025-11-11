@@ -17,9 +17,9 @@ import java.math.BigDecimal;
                 @Index(name="idx_product_options_product", columnList="product_id")
         })
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ProductOption extends BasicTimeEntity {
     @Id

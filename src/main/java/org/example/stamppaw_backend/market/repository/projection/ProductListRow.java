@@ -11,5 +11,5 @@ public interface ProductListRow {
     Category getCategory();
     ProductStatus getStatus();
     BigDecimal getPrice();
-    String getMainImageUrl(); // 서브쿼리로 뽑은 대표이미지
+    String getMainImageUrl();
 }
