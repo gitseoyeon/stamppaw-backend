@@ -36,7 +36,7 @@ public class CompanionChatService {
     private final RedisPublisher redisPublisher;
 
     public ChatRoomResponse getOrCreateChatRoom(Long companionId, Long userId) {
-        User currentUser = userService.getUserOrExcepion(userId);
+        User currentUser = userService.getUserOrException(userId);
         Companion companion = companionRepository.findById(companionId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.NOT_FOUND));
 
@@ -97,7 +97,7 @@ public class CompanionChatService {
     }
 
     public ChatMessageResponse sendMessage(ChatMessageRequest request, Long userId) {
-        User sender = userService.getUserOrExcepion(userId);
+        User sender = userService.getUserOrException(userId);
         CompanionChatRoom chatRoom = chatRoomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new StampPawException(ErrorCode.NOT_FOUND));
 
@@ -152,7 +152,7 @@ public class CompanionChatService {
             throw new StampPawException(ErrorCode.FORBIDDEN_ACCESS);
         }
 
-        User participant = userService.getUserOrExcepion(participantId);
+        User participant = userService.getUserOrException(participantId);
         chatRoom.addParticipant(participant);
         chatRoomRepository.save(chatRoom);
     }
