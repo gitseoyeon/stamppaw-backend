@@ -32,6 +32,10 @@ public enum ErrorCode {
 
     // Companion
     COMPANION_NOT_FOUND(HttpStatus.NOT_FOUND, "동행글을 찾을 수 없습니다."),
+    ALREADY_APPLICANT(HttpStatus.CONFLICT, "이미 처리된 동행 신청입니다."),
+    COMPANION_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "동행 신청을 찾을 수 없습니다."),
+    ALREADY_CHANGE_STATUS(HttpStatus.CONFLICT, "이미 처리된 신청 처리입니다."),
+
 
     // Walk
     WALK_NOT_FOUND(HttpStatus.NOT_FOUND, "산책 기록을 찾을 수 없습니다."),

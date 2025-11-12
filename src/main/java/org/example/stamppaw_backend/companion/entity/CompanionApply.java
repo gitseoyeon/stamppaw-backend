@@ -33,4 +33,9 @@ public class CompanionApply extends BasicTimeEntity {
         super.setPrePersist();
         this.status = ApplyStatus.PENDING;
     }
+
+    public void changeStatus(ApplyStatus status) {
+        this.status = status;
+    }
+
 }

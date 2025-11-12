@@ -2,11 +2,15 @@ package org.example.stamppaw_backend.companion.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.stamppaw_backend.companion.dto.request.CompanionApplyStatusRequest;
 import org.example.stamppaw_backend.companion.dto.request.CompanionCreateRequest;
 import org.example.stamppaw_backend.companion.dto.request.CompanionUpdateRequest;
+import org.example.stamppaw_backend.companion.dto.response.CompanionApplyResponse;
 import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
+import org.example.stamppaw_backend.companion.entity.CompanionApply;
 import org.example.stamppaw_backend.companion.service.CompanionService;
 import org.example.stamppaw_backend.user.entity.User;
+import org.example.stamppaw_backend.user.service.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +42,14 @@ public class CompanionController {
         return companionService.getCompanion(postId);
     }
 
+    @GetMapping("/myCompanion")
+    public ResponseEntity<Page<CompanionResponse>> getUserCompanions(@RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "5") int size,
+                                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(companionService.getUserCompanion(pageable, userDetails.getUser().getId()));
+    }
+
     @PatchMapping("/{postId}")
     public CompanionResponse modifyCompanion(@PathVariable Long postId,
                                              @AuthenticationPrincipal User user,
@@ -49,5 +61,29 @@ public class CompanionController {
     public ResponseEntity<String> deleteCompanion(@PathVariable Long postId, @AuthenticationPrincipal User user) {
         companionService.deleteCompanion(postId, user.getId());
         return ResponseEntity.ok("삭제가 완료되었습니다.");
+    }
+
+    @PostMapping("/{postId}/apply")
+    public ResponseEntity<String> applyCompanion(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        companionService.applyCompanion(postId, userDetails.getUser().getId());
+        return ResponseEntity.ok("신청이 완료되었습니다.");
+    }
+
+    @GetMapping("/{postId}/apply/manage")
+    public ResponseEntity<Page<CompanionApplyResponse>> getManageCompanion(@RequestParam(defaultValue = "0") int page,
+                                                                           @RequestParam(defaultValue = "5") int size,
+                                                                           @PathVariable Long postId,
+                                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(companionService.getApplyByUser(postId, userDetails.getUser().getId(), pageable));
+    }
+
+    @PutMapping("/{postId}/apply/status/{applyId}")
+    public ResponseEntity<String> changeApplyStatus(@PathVariable Long postId,
+                                                    @PathVariable Long applyId,
+                                                    @RequestBody CompanionApplyStatusRequest request,
+                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        companionService.changeApplyStatus(postId, applyId, userDetails.getUser().getId(), request.getStatus());
+        return ResponseEntity.ok("상태가 변경 되었습니다.");
     }
 }
