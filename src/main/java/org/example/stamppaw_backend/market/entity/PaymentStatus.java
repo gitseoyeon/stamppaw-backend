@@ -5,13 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Category {
-    CLOTHING_GOODS("의류굿즈"),
-    ACRYLIC_GOODS("아크릴굿즈"),
-    TSHIRT("티셔츠"),
-    KEYHOLDER("키홀더"),
-    CAP("모자");
+public enum PaymentStatus {
+    READY("결제 준비"),
+    IN_PROGRESS("결제 진행 중"),
+    PAYED("결제 완료"),
+    CANCELED("결제 취소");
 
     private final String label;
 }
-

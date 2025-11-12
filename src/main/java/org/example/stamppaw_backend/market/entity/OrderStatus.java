@@ -1,10 +1,14 @@
 package org.example.stamppaw_backend.market.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum OrderStatus {
-    ORDER,   //주문
-    PAYED,   // 결제 완료
-    READY,   // 상품 준비 중
-    SHIPPED, // 배송 중
-    CANCEL,  // 주문 취소
-    REFUND   //환불
+    ORDER("주문"),
+    PAYED("결제 완료"),   // 결제 진행할때 업데이트, 고민중
+    CANCEL("주문 취소");
+
+    private final String label;
 }

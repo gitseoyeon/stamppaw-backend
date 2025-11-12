@@ -22,7 +22,7 @@ public class CartResponse {
         return CartResponse.builder()
                 .cartId(cart.getId())
                 .userId(cart.getUser().getId())
-                .items(cart.getItems().stream()
+                .items(cart.getCartItems().stream()
                         .map(ItemDto::fromEntity)
                         .collect(Collectors.toList()))
                 .build();

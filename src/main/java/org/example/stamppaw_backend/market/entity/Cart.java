@@ -29,15 +29,15 @@ public class Cart extends BasicTimeEntity {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<CartItem> items = new ArrayList<>();
+    private List<CartItem> cartItems = new ArrayList<>();
 
     public void addItem(CartItem item) {
-        items.add(item);
+        cartItems.add(item);
         item.setCart(this);
     }
 
     public void removeItem(CartItem item) {
-        items.remove(item);
+        cartItems.remove(item);
         item.setCart(null);
     }
 }

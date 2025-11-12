@@ -24,7 +24,7 @@ public class CartItem extends BasicTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonBackReference("cart-items")
+    @JsonBackReference("cart-cartItems")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
