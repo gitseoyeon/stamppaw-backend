@@ -29,9 +29,18 @@ public class ProductService {
     private final S3Service s3Service;
 
     @Transactional
-    public Long createProduct(ProductCreateRequest req, List<MultipartFile> imageFiles)
+    public Long createProduct(ProductCreateRequest req,
+                              List<MultipartFile> imageFiles)
     {
         //로그인, 관리자 권한 체크
+
+        //대표이미지 - 필수
+        MultipartFile mainFile = req.getMainImageFile();
+        if (mainFile == null || mainFile.isEmpty()) {
+            throw new IllegalArgumentException("대표 이미지는 필수입니다.");
+        }
+
+        String mainImageUrl = s3Service.uploadFileAndGetUrl(mainFile);
 
         Product p = new Product();
         p.setCategory(req.getCategory());
@@ -39,15 +48,15 @@ public class ProductService {
         p.setDescription(req.getDescription());
         p.setPrice(req.getPrice());
         p.setStatus(req.getStatus() != null ? req.getStatus() : ProductStatus.READY);
+        p.setMainImageUrl(mainImageUrl);
 
+        //추가이미지 3개 - 선택
         if (imageFiles == null || imageFiles.isEmpty()) {
             log.info("[ADMIN MARKET PRODUCT] 이미지 파일이 전달되지 않았습니다.");
         } else {
 
-            boolean hasMain = false;
             for (int i = 0; i < imageFiles.size(); i++) {
                 MultipartFile file = imageFiles.get(i);
-
                 if (file == null || file.isEmpty()) continue;
 
                 String imageUrl = s3Service.uploadFileAndGetUrl(file);
@@ -55,16 +64,11 @@ public class ProductService {
                 ProductImage img = new ProductImage();
                 img.setImageUrl(imageUrl);
 
-                boolean isMain = (!hasMain && i == 0);
-                img.setMain(isMain);
-                if (isMain) hasMain = true;
-
                 img.setSort(i);
                 p.addImage(img);
 
             }
         }
-
 
         // 상품 옵션
         if (req.getOptions() != null && !req.getOptions().isEmpty()) {
@@ -75,10 +79,12 @@ public class ProductService {
                     continue;
                 }
 
-                ProductOption opt = new ProductOption();
-                opt.setName(dto.getName());
-                opt.setValue(dto.getValue());
-                opt.setExtraPrice(dto.getExtraPrice() != null ? dto.getExtraPrice() : BigDecimal.ZERO);
+                ProductOption opt = ProductOption.builder()
+                        .name(dto.getName())
+                        .value(dto.getValue())
+                        .extraPrice(dto.getExtraPrice() != null ? dto.getExtraPrice() : BigDecimal.ZERO)
+                        .build();
+
                 p.addOption(opt);
             }
         }
@@ -86,32 +92,47 @@ public class ProductService {
         return productRepository.save(p).getId();
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductListResponse> getListForAdmin(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        return productRepository.findAllForAdmin(pageable)
+        return productRepository.findAllBy(pageable)
                 .map(ProductListResponse::fromRow);
     }
 
     // 관리자용 상품 검색 : 상태 필터 없이 전체 조회 + 검색 가능
+    @Transactional(readOnly = true)
     public Page<ProductListRow> getProductSearchForAdmin(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        String keyword = (name == null || name.isBlank()) ? null : name;
+        // null 또는 공백이면 빈 문자열로 바꿔서 -> 전체 반환
+        String keyword = (name == null || name.isBlank()) ? "" : name.trim();
 
-        return productRepository.findList(keyword, pageable);
+        return productRepository.findByNameContainingIgnoreCase(keyword, pageable);
     }
 
     // 프런트용 상품 검색 :  status = SERVICE 인 상품만 대상 + 검색 가능
+    @Transactional(readOnly = true)
     public Page<ProductListRow> getProductSearch(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        String pattern = (name == null || name.isBlank())
-                ? null
-                : "%" + name.toLowerCase(Locale.ROOT) + "%";
+        String keyword = (name == null || name.isBlank()) ? "" : name.trim();
 
-        return productRepository.findServiceListByName(pattern, pageable);
+        return productRepository.findByStatusAndNameContainingIgnoreCaseOrderByIdDesc(
+                ProductStatus.SERVICE,
+                keyword,
+                pageable
+        );
     }
+
+    @Transactional(readOnly = true)
+    public List<ProductListResponse> getLatestServiceProducts() {
+        return productRepository.findTop5ByStatusOrderByIdDesc(ProductStatus.SERVICE)
+                .stream()
+                .map(ProductListResponse::fromRow)
+                .toList();
+    }
+
 
     @Transactional(readOnly = true)
     public ProductDetailResponse getProductDetail(Long id) {
@@ -121,11 +142,12 @@ public class ProductService {
         return ProductDetailResponse.fromEntity(product);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductListResponse> getProductsByCategory(Category category) {
 
         ProductStatus activeStatus = ProductStatus.SERVICE;
 
-        return productRepository.findListByCategoryAndStatus(category, activeStatus)
+        return productRepository.findByCategoryAndStatusOrderByIdDesc(category, activeStatus)
                 .stream()
                 .map(ProductListResponse::fromRow)
                 .toList();

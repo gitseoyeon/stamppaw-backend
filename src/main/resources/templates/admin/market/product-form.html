@@ -50,6 +50,22 @@
         </div>
 
         <div class="col-span-2">
+          <label>대표 이미지</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <!-- 파일 입력 숨기고 버튼으로 대체 -->
+            <input type="file" th:field="*{mainImageFile}" id="mainImageInput" accept="image/*" style="display:none;">
+            <button type="button" class="btn-secondary btn-small" onclick="document.getElementById('mainImageInput').click();">
+              대표이미지 선택
+            </button>
+            <span id="mainImageFileName" style="margin-left:5px;">
+             <span th:text="${form.mainImageUrl != null} ? ${form.mainImageUrl} : ''"></span>
+            </span>
+          </div>
+          <img id="mainImagePreview" th:src="${form.mainImageUrl != null} ? @{${form.mainImageUrl}} : ''"
+               style="max-width:150px; margin-top:5px; display: ${form.mainImageUrl != null} ? 'block' : 'none';"/>
+        </div>
+
+        <div class="col-span-2">
           <label>설명</label>
           <textarea th:field="*{description}" rows="3" placeholder="상품 설명을 입력하세요"></textarea>
         </div>
@@ -64,13 +80,10 @@
 
       <table class="admin-table">
         <thead>
-        <tr><th>대표</th><th>정렬</th><th>업로드</th></tr>
+        <tr><th>정렬</th><th>업로드</th></tr>
         </thead>
         <tbody>
         <tr th:each="i : ${#numbers.sequence(0,2)}">
-          <td>
-            <input type="checkbox" th:field="*{images[__${i}__].isMain}"/>
-          </td>
           <td>
             <input type="number" th:field="*{images[__${i}__].sort}" min="1" th:value="${i + 1}"  style="width: 60px; text-align: center;" />
           </td>
@@ -115,20 +128,34 @@
   </form>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-     document.querySelectorAll('.file-input').forEach((input) => {
-       input.addEventListener('change', (event) => {
-         const file = event.target.files[0];
-         if (!file) return;
+      // 기존 images[] 업로드 미리보기
+      document.querySelectorAll('.file-input').forEach((input) => {
+        input.addEventListener('change', (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+          const previewUrl = URL.createObjectURL(file);
+          const row = event.target.closest('tr');
+          const preview = row.querySelector('.img-preview');
+          preview.src = previewUrl;
+          preview.style.display = 'block';
+        });
+      });
 
-         const previewUrl = URL.createObjectURL(file);
-         const row = event.target.closest('tr');
-         const preview = row.querySelector('.img-preview');
+      // 대표 이미지 업로드 미리보기
+      const mainInput = document.getElementById('mainImageInput');
+      const mainPreview = document.getElementById('mainImagePreview');
+      const mainFileName = document.getElementById('mainImageFileName');
 
-         preview.src = previewUrl;
-         preview.style.display = 'block';
-       });
-     });
-   });
+      mainInput.addEventListener('change', (event) => {
+        const file = mainInput.files[0];
+        if (!file) return;
+
+        const previewUrl = URL.createObjectURL(file);
+        mainPreview.src = previewUrl;
+        mainPreview.style.display = 'block';
+        mainFileName.textContent = file.name; // 파일명 표시
+      });
+    });
   </script>
 </div>
 </body>

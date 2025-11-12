@@ -27,12 +27,8 @@ public class ProductImage extends BasicTimeEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // 스토리지 키 or URL 하나로 통일 권장 (둘 다 필요하면 명확히 역할 분리)
     @Column(name="image_url", nullable = false)
     private String imageUrl;
-
-    @Column(name="is_main", nullable = false)
-    private boolean isMain;
 
     @Builder.Default
     private Integer sort = 1;

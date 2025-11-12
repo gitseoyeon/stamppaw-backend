@@ -33,6 +33,13 @@
       </div>
 
       <div class="col-span-2">
+        <label>대표 이미지</label>
+        <div>
+          <img th:src="${product.mainImageUrl}" style="max-width:80px; border-radius:6px;"/>
+        </div>
+      </div>
+
+      <div class="col-span-2">
         <label>설명</label>
         <div class="readonly-text multiline" th:text="${product.description}"></div>
       </div>
@@ -43,14 +50,12 @@
   <section class="card">
     <div class="section-title">
       <h3>이미지</h3>
-      <span class="hint">대표 이미지는 (대표) 표시</span>
     </div>
 
     <table class="admin-table">
       <thead>
       <tr>
         <th>이미지</th>
-        <th>대표</th>
         <th>정렬</th>
       </tr>
       </thead>
@@ -59,7 +64,6 @@
         <td>
           <img th:src="${img.imageUrl}" style="max-width:80px; border-radius:6px;"/>
         </td>
-        <td th:text="${img.isMain ? '대표' : ''}"></td>
         <td th:text="${img.sort}"></td>
       </tr>
       </tbody>
@@ -92,11 +96,11 @@
     <form th:action="@{'/admin/products/' + ${product.id} + '/delete'}"
           method="post"
           style="display:inline;">
-      <button type="submit" class="btn-danger btn-lg"
+      <button type="submit" class="btn-primary btn-lg"
               onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
     </form>
 
-    <a th:href="@{/admin/products}" class="btn-secondary btn-lg">목록</a>
+    <a th:href="@{/admin/products}" class="btn-primary btn-lg">목록</a>
   </div>
   </div>
 </div>

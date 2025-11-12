@@ -9,6 +9,12 @@
     <a th:href="@{/admin/products/new}" class="btn-primary btn-lg">상품 등록</a>
   </div>
 
+  <form th:action="@{/admin/products/search}" method="get" class="search-form" style="margin: 0 15px 15px;">
+    <input type="text" name="name" th:value="${name}" placeholder="상품명 검색"
+           style="padding:8px; border:1px solid #ccc; border-radius:6px; width:200px;">
+    <button type="submit" class="btn btn-primary" style="padding:8px 12px; margin-left:6px;">검색</button>
+  </form>
+
   <div style="margin: 0px 15px;">
   <table class="admin-table">
     <thead>
@@ -23,7 +29,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="product : ${products}">
+    <tr th:each="product : ${products.content}">
       <td th:text="${product.id}"></td>
       <td th:text="${product.category}"></td>
       <td th:text="${product.name}"></td>
@@ -35,7 +41,7 @@
       <td
       >
         <a th:href="@{'/admin/products/' + ${product.id}}" class="btn btn-sm btn-primary">상세보기</a>
-        <a th:href="@{/admin/market/products/{id}(id=${product.id})}">수정</a>
+        <a th:href="@{/admin/market/products/{id}(id=${product.id})}" class="btn-third">수정</a>
 
         <form th:action="@{'/admin/products/' + ${product.id} + '/delete'}" method="post" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-primary" onclick="return confirm('정말 삭제하시겠습니까?');">
@@ -46,12 +52,27 @@
 
       </td>
     </tr>
-    <tr th:if="${#lists.isEmpty(products)}">
-      <td colspan="6" class="text-center">등록된 상품이 없습니다.</td>
+    <tr th:if="${products.totalElements == 0}">
+      <td colspan="7" class="text-center">등록된 상품이 없습니다.</td>
     </tr>
     </tbody>
   </table>
   </div>
+
+  <div class="pagination" style="text-align:center; margin-top: 20px;">
+        <a th:if="${products.hasPrevious()}"
+       th:href="@{/admin/products(page=${products.number - 1}, name=${name})}">이전</a>
+
+    <span th:each="page : ${#numbers.sequence(0, products.totalPages - 1)}"
+          th:classappend="${page == products.number} ? 'active'">
+        <a th:href="@{/admin/products(page=${page}, name=${name})}"
+           th:text="${page + 1}"></a>
+    </span>
+
+    <a th:if="${products.hasNext()}"
+       th:href="@{/admin/products(page=${products.number + 1}, name=${name})}">다음</a>
+  </div>
+
 </div>
 </body>
 </html>

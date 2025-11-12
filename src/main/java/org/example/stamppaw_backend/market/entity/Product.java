@@ -8,7 +8,9 @@ import org.example.stamppaw_backend.common.BasicTimeEntity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products",
@@ -33,7 +35,7 @@ public class Product extends BasicTimeEntity {
     @Column(length = 200, nullable = false)
     private String name;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(precision = 18, scale = 2, nullable = false)
@@ -43,6 +45,9 @@ public class Product extends BasicTimeEntity {
     @Column(length = 30, nullable = false)
     @Builder.Default
     private ProductStatus status = ProductStatus.READY;
+
+    @Column(nullable = false)
+    private String mainImageUrl;
 
     @ToString.Exclude
     @JsonManagedReference("product-images")
@@ -54,22 +59,13 @@ public class Product extends BasicTimeEntity {
     @JsonManagedReference("product-options")
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ProductOption> options = new ArrayList<>();
+    private Set<ProductOption> options = new LinkedHashSet<>();
 
     // 연관관계 편의 메서드
     public void addImage(ProductImage img){ img.setProduct(this); images.add(img); }
-    public void addOption(ProductOption opt){ opt.setProduct(this); options.add(opt); }
-
-    public String getMainImageUrl() {
-        if (images == null || images.isEmpty()) {
-            return null;
-        }
-
-        return images.stream()
-                .filter(ProductImage::isMain)  // 대표 이미지 조건
-                .findFirst()
-                .map(ProductImage::getImageUrl)
-                .orElse(images.get(0).getImageUrl()); // 없으면 첫번째 이미지 반환
+    public void addOption(ProductOption opt){
+        opt.setProduct(this);
+        options.add(opt);
     }
 
 }

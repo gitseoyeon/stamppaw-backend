@@ -1,4 +1,129 @@
 package org.example.stamppaw_backend.market.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.stamppaw_backend.common.exception.ErrorCode;
+import org.example.stamppaw_backend.common.exception.StampPawException;
+import org.example.stamppaw_backend.market.dto.request.CartCreateRequest;
+import org.example.stamppaw_backend.market.dto.request.CartUpdateRequest;
+import org.example.stamppaw_backend.market.dto.response.CartResponse;
+import org.example.stamppaw_backend.market.entity.Cart;
+import org.example.stamppaw_backend.market.entity.CartItem;
+import org.example.stamppaw_backend.market.entity.Product;
+import org.example.stamppaw_backend.market.repository.CartItemRepository;
+import org.example.stamppaw_backend.market.repository.CartRepository;
+import org.example.stamppaw_backend.market.repository.ProductRepository;
+import org.example.stamppaw_backend.user.entity.User;
+import org.example.stamppaw_backend.user.service.UserService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
 public class CartService {
+    private final ProductRepository productRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final UserService userService;
+
+    //카트 조회후 없으면 생성
+    @Transactional
+    public CartResponse getUserCart(Long userId) {
+
+        User user = userService.getUserOrException(userId);
+
+        Cart cart = cartRepository.findByUserIdWithItems(userId)
+                .orElseGet(() -> cartRepository.save(
+                        Cart.builder().user(user).build()
+                ));
+
+        return CartResponse.fromEntity(cart);
+    }
+
+    @Transactional
+    public Cart createCartWithItems(CartCreateRequest request) {
+
+        User user = userService.getUserOrException(request.getUserId());
+
+        // 장바구니 조회 or 생성
+        Cart cart = cartRepository.findByUser(user)
+                .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
+
+        // 상품 아이템 반복 처리
+        for (CartCreateRequest.ItemDto itemDto : request.getItems()) {
+
+            Product product = productRepository.findById(itemDto.getProductId())
+                    .orElseThrow(() -> new StampPawException(ErrorCode.PRODUCT_NOT_FOUND));
+
+            //동일 상품 중복 방지: 이미 담겨있으면 수량만 증가
+            CartItem existing = cartItemRepository
+                    .findByCartIdAndProductId(cart.getId(), itemDto.getProductId())
+                    .orElse(null);
+
+            if (existing != null) {
+                existing.setQuantity(existing.getQuantity() + itemDto.getQuantity());
+                existing.setSubtotal(
+                        existing.getPrice().multiply(BigDecimal.valueOf(existing.getQuantity()))
+                );
+                cartItemRepository.save(existing);
+                continue;
+            }
+
+            // (2) 신규 CartItem 생성
+            CartItem newItem = CartItem.builder()
+                    .cart(cart)
+                    .product(product)
+                    .optionSummary(itemDto.getOptionSummary())
+                    .quantity(itemDto.getQuantity())
+                    .price(itemDto.getPrice())
+                    .subtotal(itemDto.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())))
+                    .userImageUrl(itemDto.getUserImageUrl())
+                    .build();
+
+            cartItemRepository.save(newItem);
+        }
+
+        return cart;
+    }
+
+
+    //카트의 상품의 수량 변경
+    @Transactional
+    public void updateItemQuantity(CartUpdateRequest request) {
+
+        CartItem cartItem = cartItemRepository.findById(request.getCartItemId())
+                .orElseThrow(() -> new StampPawException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        if (request.getQuantity() <= 0) {
+            throw new StampPawException(ErrorCode.INVALID_QUANTITY);
+        }
+
+        cartItem.setQuantity(request.getQuantity());
+
+        BigDecimal extraPrice = request.getExtraPrice() != null ? request.getExtraPrice() : BigDecimal.ZERO;
+
+        //새 단가 계산 = 기본가 + 추가금
+        BigDecimal basePrice = cartItem.getProduct().getPrice();
+        BigDecimal newPrice = basePrice.add(extraPrice);
+        cartItem.setPrice(newPrice);
+
+        //subtotal = (기본가 + 추가금) × 수량
+        cartItem.setSubtotal(newPrice.multiply(BigDecimal.valueOf(request.getQuantity())));
+
+        //log.info("🛒 CartItem[{}] updated → qty={}, basePrice={}, extraPrice={}, subtotal={}",
+        //        cartItem.getId(), request.getQuantity(), basePrice, extraPrice, cartItem.getSubtotal());
+    }
+
+    @Transactional
+    public void removeItem(Long cartItemId) {
+        CartItem item = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        Cart cart = item.getCart();
+        cart.removeItem(item);
+    }
+
 }

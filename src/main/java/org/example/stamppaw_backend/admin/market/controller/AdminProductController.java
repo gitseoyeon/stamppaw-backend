@@ -37,12 +37,15 @@ public class AdminProductController {
     public String create(@Valid @ModelAttribute("form") ProductCreateRequest form,
                          BindingResult binding,
                          @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+                         @RequestParam(value = "mainImageFile", required = false) MultipartFile mainImageFile,
                          RedirectAttributes redirect)
     {
 
         if (binding.hasErrors()) {
             return "admin/market/product-form";
         }
+
+        form.setMainImageFile(mainImageFile);
 
         Long id = productService.createProduct(form, imageFiles);
 
@@ -68,8 +71,8 @@ public class AdminProductController {
     {
         Page<ProductListResponse> products = productService.getListForAdmin(page, size);
 
-        model.addAttribute("products", products.getContent());
-        model.addAttribute("currentPage", page);
+        model.addAttribute("products", products);
+        model.addAttribute("currentPage", products.getNumber());
         model.addAttribute("totalPages", products.getTotalPages());
         model.addAttribute("title", "상품 목록");
 
@@ -78,17 +81,17 @@ public class AdminProductController {
 
     @GetMapping("/search")
     public String listProductSearchForAdmin(
-            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model
     ) {
-        Page<ProductListRow> products = productService.getProductSearchForAdmin(keyword, page, size);
+        Page<ProductListRow> products = productService.getProductSearchForAdmin(name, page, size);
 
-        model.addAttribute("products", products.getContent());
-        model.addAttribute("currentPage", page);
+        model.addAttribute("products", products);
+        model.addAttribute("currentPage", products.getNumber());
         model.addAttribute("totalPages", products.getTotalPages());
-        model.addAttribute("keyword", keyword); //검색 정보 유지용
+        model.addAttribute("name", name); //검색 정보 유지용
         model.addAttribute("title", "상품 검색 결과");
 
         return "admin/market/product-list";

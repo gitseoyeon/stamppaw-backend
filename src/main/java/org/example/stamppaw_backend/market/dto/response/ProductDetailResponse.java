@@ -5,6 +5,7 @@ import org.example.stamppaw_backend.market.entity.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 public record ProductDetailResponse(
@@ -16,7 +17,7 @@ public record ProductDetailResponse(
         ProductStatus status,
         String mainImageUrl,
         List<ProductImage> images,
-        List<ProductOption> options
+        Set<ProductOption> options
 ) {
     public static ProductDetailResponse fromEntity(Product product) {
         return ProductDetailResponse.builder()
