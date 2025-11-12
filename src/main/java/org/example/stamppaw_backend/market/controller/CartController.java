@@ -2,24 +2,28 @@ package org.example.stamppaw_backend.market.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.market.dto.request.CartCreateRequest;
 import org.example.stamppaw_backend.market.dto.request.CartUpdateRequest;
 import org.example.stamppaw_backend.market.dto.response.CartResponse;
 import org.example.stamppaw_backend.market.entity.Cart;
 import org.example.stamppaw_backend.market.service.CartService;
+import org.example.stamppaw_backend.user.service.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
+@Slf4j
 public class CartController {
     private final CartService cartService;
 
     // 유저 장바구니 조회
-    @GetMapping("/{userId}")
-    public ResponseEntity<CartResponse> getCart(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getUserCart(userId));
+    @GetMapping
+    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(cartService.getUserCart(userDetails.getUser().getId()));
     }
 
     @PostMapping
