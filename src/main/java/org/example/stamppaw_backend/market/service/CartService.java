@@ -73,7 +73,7 @@ public class CartService {
 
             //사용자 이미지가 널이 아닐경우 이미지 업로드 추가
 
-            // (2) 신규 CartItem 생성
+            //CartItem 생성
             CartItem newItem = CartItem.builder()
                     .cart(cart)
                     .product(product)

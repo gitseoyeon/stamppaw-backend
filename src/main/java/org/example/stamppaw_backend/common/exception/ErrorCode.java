@@ -31,6 +31,8 @@ public enum ErrorCode {
     INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "카트에 담은 상품 수량은 1이상 이어야 합니다"),
     CART_NOT_FOUND(HttpStatus.NOT_FOUND, "장바구니를 찾을 수 없습니다."),
     UNAUTHORIZED_CART_ACCESS(HttpStatus.FORBIDDEN, "다른 사용자의 카트에 접근할 수 없습니다."),
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문 정보를 찾을 수 없습니다."),
+    UNAUTHORIZED_ORDER_ACCESS(HttpStatus.FORBIDDEN, "다른 사용자의 주문 정보에 접근할 수 없습니다."),
 
     // Companion
     COMPANION_NOT_FOUND(HttpStatus.NOT_FOUND, "동행글을 찾을 수 없습니다."),

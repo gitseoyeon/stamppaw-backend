@@ -5,12 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
 import org.example.stamppaw_backend.market.dto.request.OrderCreateRequest;
+import org.example.stamppaw_backend.market.dto.request.OrderStatusUpdateRequest;
+import org.example.stamppaw_backend.market.dto.response.OrderListResponse;
 import org.example.stamppaw_backend.market.entity.*;
 import org.example.stamppaw_backend.market.repository.CartItemRepository;
 import org.example.stamppaw_backend.market.repository.CartRepository;
 import org.example.stamppaw_backend.market.repository.OrderRepository;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +87,32 @@ public class OrderService {
         cartItemRepository.deleteAll(selectedItems);
 
         return order;
+    }
+
+    public Page<OrderListResponse> getAllOrderSummaries(OrderStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        return orderRepository.findAllSummaries(status, pageable)
+                .map(OrderListResponse::fromProjection);
+    }
+
+    public Page<OrderListResponse> getUserOrders(Long userId, OrderStatus status, Pageable pageable) {
+
+        return orderRepository.findUserOrders(userId, status, pageable)
+                .map(OrderListResponse::fromProjection);
+    }
+
+    public void updateOrderStatus(Long userId, Long orderId, OrderStatus status) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.ORDER_NOT_FOUND));
+
+        Long ownerId = order.getUser().getId();
+        if (!ownerId.equals(userId)) {
+            throw new StampPawException(ErrorCode.UNAUTHORIZED_ORDER_ACCESS);
+        }
+
+
     }
 
 }
