@@ -132,6 +132,13 @@ public class OrderService {
         if (!ownerId.equals(userId)) {
             throw new StampPawException(ErrorCode.UNAUTHORIZED_ORDER_ACCESS);
         }
+
+        if (status == OrderStatus.CANCELED) {
+            if (order.getStatus() != OrderStatus.ORDER) {
+                throw new StampPawException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
+            }
+        }
+
         orderRepository.updateOrderStatus(orderId, status);
     }
 

@@ -55,7 +55,6 @@ public class OrderController {
         return ResponseEntity.ok(items);
     }
 
-
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<Void> updateOrderStatus(
             @AuthenticationPrincipal CustomUserDetails userDetails,

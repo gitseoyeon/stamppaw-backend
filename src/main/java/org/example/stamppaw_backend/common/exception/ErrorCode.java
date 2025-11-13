@@ -33,6 +33,7 @@ public enum ErrorCode {
     UNAUTHORIZED_CART_ACCESS(HttpStatus.FORBIDDEN, "다른 사용자의 카트에 접근할 수 없습니다."),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문 정보를 찾을 수 없습니다."),
     UNAUTHORIZED_ORDER_ACCESS(HttpStatus.FORBIDDEN, "다른 사용자의 주문 정보에 접근할 수 없습니다."),
+    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "해당 주문은 취소할 수 없습니다.\n관리자에 문의해주십시요."),
 
     // Companion
     COMPANION_NOT_FOUND(HttpStatus.NOT_FOUND, "동행글을 찾을 수 없습니다."),
