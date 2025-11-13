@@ -47,6 +47,11 @@ public class CompanionApplyService {
         companionApply.changeStatus(status);
     }
 
+    public CompanionApply getApplyOrException(Long applyId) {
+        return companionApplyRepository.findById(applyId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.APPLY_NOT_FOUND));
+    }
+
     private void isAlreadyApply(User user, List<CompanionApply> applies) {
         for(CompanionApply apply : applies) {
             if(apply.getApplicant().equals(user)) {

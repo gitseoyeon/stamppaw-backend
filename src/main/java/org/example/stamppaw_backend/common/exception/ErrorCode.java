@@ -35,6 +35,10 @@ public enum ErrorCode {
     ALREADY_APPLICANT(HttpStatus.CONFLICT, "이미 처리된 동행 신청입니다."),
     COMPANION_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "동행 신청을 찾을 수 없습니다."),
     ALREADY_CHANGE_STATUS(HttpStatus.CONFLICT, "이미 처리된 신청 처리입니다."),
+    NOT_ALLOW_APPLY(HttpStatus.BAD_REQUEST, "동행 수락이 된 요청이 아닙니다."),
+    APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "동행 신청을 찾을 수 없습니다."),
+    NOT_APPLY_USER(HttpStatus.NOT_FOUND, "동행 신청자가 아닙니다."),
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰 태그를 찾을 수 없습니다."),
 
 
     // Walk
