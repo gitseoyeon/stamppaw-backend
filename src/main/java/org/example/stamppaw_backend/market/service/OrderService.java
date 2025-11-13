@@ -33,6 +33,11 @@ public class OrderService {
         Cart cart = cartRepository.findById(request.getCartId())
                 .orElseThrow(() -> new StampPawException(ErrorCode.CART_NOT_FOUND));
 
+        Long ownerId = cart.getUser().getId();
+        if (!ownerId.equals(userId)) {
+            throw new StampPawException(ErrorCode.UNAUTHORIZED_CART_ACCESS);
+        }
+
         User user = userService.getUserOrException(cart.getUser().getId());
 
         //선택된 CartItem만 필터링
@@ -45,7 +50,7 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Order order = Order.builder()
-                .userId(user.getId())
+                .user(user)
                 .status(OrderStatus.ORDER)
                 .totalAmount(totalAmount)
                 .shippingName(request.getShippingName())

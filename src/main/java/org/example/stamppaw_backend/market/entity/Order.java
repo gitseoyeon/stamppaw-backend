@@ -21,17 +21,13 @@ public class Order extends BasicTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
-
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     private BigDecimal totalAmount;
 
     private String shippingName;
-
     private String shippingAddress;
-
     private String shippingMobile;
 
     @Enumerated(EnumType.STRING)
