@@ -4,10 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.companion.dto.request.CompanionApplyStatusRequest;
 import org.example.stamppaw_backend.companion.dto.request.CompanionCreateRequest;
+import org.example.stamppaw_backend.companion.dto.request.CompanionRecruitmentStatusRequest;
 import org.example.stamppaw_backend.companion.dto.request.CompanionUpdateRequest;
 import org.example.stamppaw_backend.companion.dto.response.CompanionApplyResponse;
 import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
-import org.example.stamppaw_backend.companion.entity.CompanionApply;
+import org.example.stamppaw_backend.companion.dto.response.CompanionUserApplyResponse;
+import org.example.stamppaw_backend.companion.service.CompanionApplyService;
 import org.example.stamppaw_backend.companion.service.CompanionService;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.service.CustomUserDetails;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CompanionController {
     private final CompanionService companionService;
+    private final CompanionApplyService companionApplyService;
 
     @PostMapping
     public CompanionResponse createCompanion(@Valid CompanionCreateRequest request, @AuthenticationPrincipal User user) {
@@ -85,5 +88,21 @@ public class CompanionController {
                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
         companionService.changeApplyStatus(postId, applyId, userDetails.getUser().getId(), request.getStatus());
         return ResponseEntity.ok("상태가 변경 되었습니다.");
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<String> changeRecruitmentStatus(@PathVariable Long postId,
+                                                    @RequestBody CompanionRecruitmentStatusRequest request,
+                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        companionService.changeRecruitmentStatus(postId, userDetails.getUser().getId(), request.getStatus());
+        return ResponseEntity.ok("상태가 변경 되었습니다.");
+    }
+
+    @GetMapping("/myApply")
+    public ResponseEntity<Page<CompanionUserApplyResponse>> getUserApply(@RequestParam(defaultValue = "0") int page,
+                                                                         @RequestParam(defaultValue = "5") int size,
+                                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(companionApplyService.getUserApply(pageable, userDetails.getUser().getId()));
     }
 }

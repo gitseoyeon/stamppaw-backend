@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.common.S3Service;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
-import org.example.stamppaw_backend.companion.dto.CompanionDto;
+import org.example.stamppaw_backend.companion.dto.CompanionManageDto;
 import org.example.stamppaw_backend.companion.dto.request.CompanionCreateRequest;
 import org.example.stamppaw_backend.companion.dto.request.CompanionUpdateRequest;
 import org.example.stamppaw_backend.companion.dto.response.CompanionApplyResponse;
@@ -12,6 +12,7 @@ import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
 import org.example.stamppaw_backend.companion.entity.ApplyStatus;
 import org.example.stamppaw_backend.companion.entity.Companion;
 import org.example.stamppaw_backend.companion.entity.CompanionApply;
+import org.example.stamppaw_backend.companion.entity.RecruitmentStatus;
 import org.example.stamppaw_backend.companion.repository.CompanionRepository;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.service.UserService;
@@ -19,8 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +73,7 @@ public class CompanionService {
         }
 
         return companion.updateCompanion(
-                CompanionDto.builder()
+                CompanionManageDto.builder()
                         .title(request.getTitle())
                         .content(request.getContent())
                         .image(s3Service.uploadFileAndGetUrl(request.getImage()))
@@ -112,6 +111,13 @@ public class CompanionService {
         Companion companion = getCompanionOrException(postId);
         verifyUser(user, companion);
         companionApplyService.changeApplyStatus(applyId, status);
+    }
+
+    public void changeRecruitmentStatus(Long postId, Long userId, RecruitmentStatus status) {
+        User user = userService.getUserOrException(userId);
+        Companion companion = getCompanionOrException(postId);
+        verifyUser(user, companion);
+        companion.updateStatus(status);
     }
 
     private Companion getCompanionOrException(Long postId) {

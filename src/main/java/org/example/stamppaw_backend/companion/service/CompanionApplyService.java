@@ -3,13 +3,13 @@ package org.example.stamppaw_backend.companion.service;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
-import org.example.stamppaw_backend.companion.dto.response.CompanionApplyResponse;
-import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
+import org.example.stamppaw_backend.companion.dto.response.CompanionUserApplyResponse;
 import org.example.stamppaw_backend.companion.entity.ApplyStatus;
 import org.example.stamppaw_backend.companion.entity.Companion;
 import org.example.stamppaw_backend.companion.entity.CompanionApply;
 import org.example.stamppaw_backend.companion.repository.CompanionApplyRepository;
 import org.example.stamppaw_backend.user.entity.User;
+import org.example.stamppaw_backend.user.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,7 @@ import java.util.List;
 @Transactional
 public class CompanionApplyService {
     private final CompanionApplyRepository companionApplyRepository;
+    private final UserService userService;
 
     public void saveCompanionApply(User user, Companion companion) {
         isAlreadyApply(user, companion.getApplies());
@@ -45,6 +46,13 @@ public class CompanionApplyService {
             throw new StampPawException(ErrorCode.ALREADY_CHANGE_STATUS);
         }
         companionApply.changeStatus(status);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CompanionUserApplyResponse> getUserApply(Pageable pageable, Long userId) {
+        User user = userService.getUserOrException(userId);
+        Page<CompanionApply> applies = companionApplyRepository.findCompanionApplyByApplicant(user, pageable);
+        return applies.map(CompanionUserApplyResponse::from);
     }
 
     public CompanionApply getApplyOrException(Long applyId) {
