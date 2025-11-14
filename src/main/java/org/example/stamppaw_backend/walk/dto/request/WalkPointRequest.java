@@ -1,5 +1,6 @@
 package org.example.stamppaw_backend.walk.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -7,5 +8,6 @@ import java.time.LocalDateTime;
 public class WalkPointRequest {
     private Double lat;
     private Double lng;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
 }

@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WalkResponse {
+    private Long id;
     private Double distance;
     private Long duration;
     private Double startLat;
@@ -26,6 +27,7 @@ public class WalkResponse {
 
     public static WalkResponse fromEntity(Walk walk) {
         return WalkResponse.builder()
+                .id(walk.getId())
                 .distance(walk.getDistance())
                 .duration(walk.getDuration())
                 .startLat(walk.getStartLat())

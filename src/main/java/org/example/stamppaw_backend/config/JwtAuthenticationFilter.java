@@ -34,37 +34,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // ✅ 1. 로그인 없이 임시 개발 모드: JWT 헤더가 있든 없든 무시하고 통과
+        if (true) { // <- 임시로 전체 비활성화
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
-
-        try {
-            if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getEmail(token);
-                String role = jwtTokenProvider.getRole(token);
-
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        List.of(new SimpleGrantedAuthority(role != null ? role : "ROLE_USER"))
-                    );
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                System.out.println("JWT 인증 성공: " + email + " / 권한: " + role);
-            } else {
-                System.out.println("JWT 유효성 검증 실패");
-            }
-        } catch (Exception e) {
-            System.out.println("WT 필터 처리 중 예외 발생: " + e.getMessage());
-        }
+        // ✅ 2. 이후 로그인 기능 붙이면 아래 코드 복구
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//            String token = authHeader.substring(7);
+//            if (jwtTokenProvider.validateToken(token)) {
+//                String username = jwtTokenProvider.getUsername(token);
+//                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//                UsernamePasswordAuthenticationToken authentication =
+//                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                SecurityContextHolder.getContext().setAuthentication(authentication);
+//            }
+//        }
 
         filterChain.doFilter(request, response);
     }

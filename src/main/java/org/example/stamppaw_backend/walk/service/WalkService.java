@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.common.S3Service;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
+import org.example.stamppaw_backend.mission.service.MissionProcessor;
 import org.example.stamppaw_backend.user.entity.User;
-import org.example.stamppaw_backend.user.service.AuthenticationService;
 import org.example.stamppaw_backend.walk.dto.request.*;
 import org.example.stamppaw_backend.walk.dto.response.*;
 import org.example.stamppaw_backend.walk.entity.*;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,14 +29,12 @@ public class WalkService {
 
     private final WalkRepository walkRepository;
     private final WalkPointRepository walkPointRepository;
-    private final AuthenticationService authenticationService;
     private final WalkMapService walkMapService;
     private final S3Service s3Service;
+    private final MissionProcessor missionProcessor;
 
     @Transactional
-    public WalkStartResponse startWalk(WalkStartRequest request) {
-        User currentUser = authenticationService.getCurrentUser();
-
+    public WalkStartResponse startWalk(WalkStartRequest request, User currentUser) {
         Walk walk = Walk.builder()
                 .user(currentUser)
                 .startLat(request.getLat())
@@ -45,7 +44,6 @@ public class WalkService {
                 .build();
 
         walk = walkRepository.save(walk);
-
         walkMapService.addPoint(walk.getId(), request.getLat(), request.getLng(), request.getTimestamp());
 
         return WalkStartResponse.fromEntity(walk);
@@ -79,22 +77,23 @@ public class WalkService {
 
         walkRepository.save(walk);
 
+        missionProcessor.handleWalkCompleted(walk);
+
         return WalkEndResponse.fromEntity(walk);
     }
+
 
     @Transactional
     public WalkResponse editWalk(Long walkId, WalkRecordRequest request) {
         Walk walk = walkRepository.findById(walkId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.WALK_NOT_FOUND));
 
-        // 메모
         Optional.ofNullable(request.getMemo())
                 .filter(m -> !m.isBlank())
                 .ifPresent(walk::setMemo);
 
-        // 사진
         if (request.getPhotos() != null && !request.getPhotos().isEmpty()) {
-            walk.getPhotos().clear(); // orphanRemoval=true
+            walk.getPhotos().clear();
             List<String> uploadedUrls = s3Service.uploadFilesAndGetUrls(request.getPhotos());
 
             uploadedUrls.forEach(url -> {
@@ -107,7 +106,6 @@ public class WalkService {
 
         walk.setStatus(WalkStatus.RECORDED);
         walkRepository.save(walk);
-
         return buildWalkResponse(walk);
     }
 
@@ -119,9 +117,7 @@ public class WalkService {
     }
 
     @Transactional(readOnly = true)
-    public Page<WalkResponse> getUserWalks(Pageable pageable) {
-        User currentUser = authenticationService.getCurrentUser();
-
+    public Page<WalkResponse> getUserWalks(User currentUser, Pageable pageable) {
         Page<Walk> walksPage = walkRepository.findAllByUserIdAndStatusOrderByStartTimeDesc(
                 currentUser.getId(), WalkStatus.RECORDED, pageable);
 
@@ -136,8 +132,6 @@ public class WalkService {
     public void deleteWalk(Long walkId) {
         Walk walk = walkRepository.findById(walkId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.WALK_NOT_FOUND));
-
-        // s3Service.deleteFile(photoUrl);
 
         walkRepository.delete(walk);
         log.info("🗑️ Walk deleted successfully: id={}", walkId);
