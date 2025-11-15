@@ -1,11 +1,12 @@
 package org.example.stamppaw_backend.admin.mission.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.stamppaw_backend.admin.mission.dto.MissionRequest;
 import org.example.stamppaw_backend.admin.mission.service.MissionService;
 import org.example.stamppaw_backend.admin.mission.dto.MissionDto;
-import org.example.stamppaw_backend.mission.dto.UserMissionDto;
-import org.example.stamppaw_backend.mission.entity.UserMission;
-import org.example.stamppaw_backend.mission.service.UserMissionService;
+import org.example.stamppaw_backend.user_mission.dto.UserMissionDto;
+import org.example.stamppaw_backend.user_mission.entity.UserMission;
+import org.example.stamppaw_backend.user_mission.service.UserMissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,9 @@ public class AdminMissionController {
     private final UserMissionService userMissionService;
 
     @PostMapping
-    public ResponseEntity<MissionDto> createMission(@RequestBody MissionDto request) {
+    public ResponseEntity<MissionDto> createMission(
+            @RequestBody MissionRequest request
+    ) {
         return ResponseEntity.ok(missionService.createMission(request));
     }
 
@@ -34,14 +37,6 @@ public class AdminMissionController {
     @GetMapping("/{id}")
     public ResponseEntity<MissionDto> getMissionById(@PathVariable Long id) {
         return ResponseEntity.ok(missionService.getMissionById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<MissionDto> updateMission(
-            @PathVariable Long id,
-            @RequestBody MissionDto request
-    ) {
-        return ResponseEntity.ok(missionService.updateMission(id, request));
     }
 
     @DeleteMapping("/{id}")

@@ -1,15 +1,21 @@
 package org.example.stamppaw_backend.admin.mission.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.example.stamppaw_backend.admin.mission.dto.MissionRequest;
 import org.example.stamppaw_backend.admin.mission.entity.Mission;
 import org.example.stamppaw_backend.admin.mission.repository.MissionRepository;
+import org.example.stamppaw_backend.admin.mission.service.creator.MissionCreator;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
 import org.example.stamppaw_backend.admin.mission.dto.MissionDto;
+import org.example.stamppaw_backend.user_mission.entity.MissionType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -17,55 +23,47 @@ import java.util.List;
 public class MissionService {
 
     private final MissionRepository missionRepository;
+    private final List<MissionCreator<?>> creators;
 
-    public MissionDto createMission(MissionDto dto) {
-        Mission mission = Mission.builder()
-                .content(dto.getContent())
-                .point(dto.getPoint())
-                .type(dto.getType())
-                .build();
+    private final Map<MissionType, MissionCreator<?>> creatorMap = new HashMap<>();
 
-        return toDto(missionRepository.save(mission));
+    @PostConstruct
+    public void init() {
+        for (MissionCreator<?> creator : creators) {
+            creatorMap.put(creator.supports(), creator);
+        }
     }
 
-    @Transactional(readOnly = true)
+    public MissionDto createMission(MissionRequest req) {
+
+        MissionType type = req.getType();
+
+        MissionCreator creator = creatorMap.get(type);
+        if (creator == null) {
+            throw new StampPawException(ErrorCode.INVALID_MISSION_TYPE);
+        }
+
+        Mission mission = creator.create(req);
+        missionRepository.save(mission);
+
+        return MissionDto.fromEntity(mission);
+    }
+
     public List<MissionDto> getAllMissions() {
-        return missionRepository.findAll()
-                .stream()
-                .map(this::toDto)
+        return missionRepository.findAll().stream()
+                .map(MissionDto::fromEntity)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public MissionDto getMissionById(Long id) {
         Mission mission = missionRepository.findById(id)
                 .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
-        return toDto(mission);
-    }
-
-    public MissionDto updateMission(Long id, MissionDto dto) {
-        Mission mission = missionRepository.findById(id)
-                .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
-
-        mission.setContent(dto.getContent());
-        mission.setPoint(dto.getPoint());
-        mission.setType(dto.getType());
-
-        return toDto(missionRepository.save(mission));
+        return MissionDto.fromEntity(mission);
     }
 
     public void deleteMission(Long id) {
         Mission mission = missionRepository.findById(id)
                 .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
         missionRepository.delete(mission);
-    }
-
-    private MissionDto toDto(Mission mission) {
-        return MissionDto.builder()
-                .id(mission.getId())
-                .content(mission.getContent())
-                .point(mission.getPoint())
-                .type(mission.getType())
-                .build();
     }
 }

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.common.S3Service;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
-import org.example.stamppaw_backend.mission.service.MissionProcessor;
+import org.example.stamppaw_backend.admin.mission.service.MissionProcessor;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.walk.dto.request.*;
 import org.example.stamppaw_backend.walk.dto.response.*;

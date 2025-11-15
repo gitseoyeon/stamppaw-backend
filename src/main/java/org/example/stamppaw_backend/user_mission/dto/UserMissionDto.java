@@ -1,7 +1,7 @@
-package org.example.stamppaw_backend.mission.dto;
+package org.example.stamppaw_backend.user_mission.dto;
 
 import lombok.*;
-import org.example.stamppaw_backend.mission.entity.UserMission;
+import org.example.stamppaw_backend.user_mission.entity.UserMission;
 
 import java.time.LocalDate;
 

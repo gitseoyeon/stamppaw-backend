@@ -2,8 +2,8 @@ package org.example.stamppaw_backend.point.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.stamppaw_backend.mission.entity.MissionType;
-import org.example.stamppaw_backend.mission.entity.UserMission;
+import org.example.stamppaw_backend.user_mission.entity.MissionType;
+import org.example.stamppaw_backend.user_mission.entity.UserMission;
 import org.example.stamppaw_backend.user.entity.User;
 import org.hibernate.annotations.CreationTimestamp;
 

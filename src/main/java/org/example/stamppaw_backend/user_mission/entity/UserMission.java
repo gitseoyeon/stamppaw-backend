@@ -1,4 +1,4 @@
-package org.example.stamppaw_backend.mission.entity;
+package org.example.stamppaw_backend.user_mission.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

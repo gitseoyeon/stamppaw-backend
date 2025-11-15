@@ -1,20 +1,22 @@
-package org.example.stamppaw_backend.mission.service;
+package org.example.stamppaw_backend.admin.mission.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.admin.mission.entity.Mission;
-import org.example.stamppaw_backend.mission.entity.MissionType;
-import org.example.stamppaw_backend.mission.entity.UserMission;
-import org.example.stamppaw_backend.mission.repository.UserMissionRepository;
+import org.example.stamppaw_backend.user_mission.entity.MissionType;
+import org.example.stamppaw_backend.user_mission.entity.UserMission;
+import org.example.stamppaw_backend.user_mission.repository.UserMissionRepository;
 import org.example.stamppaw_backend.point.entity.Point;
 import org.example.stamppaw_backend.point.repository.PointRepository;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.walk.entity.Walk;
-import org.example.stamppaw_backend.mission.service.handler.MissionHandler;
+import org.example.stamppaw_backend.admin.mission.service.handler.MissionHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,19 @@ public class MissionProcessor {
     private final PointRepository pointRepository;
     private final List<MissionHandler> handlers;
 
+    private final Map<MissionType, MissionHandler> handlerMap = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        for (MissionHandler handler : handlers) {
+            for (MissionType type : MissionType.values()) {
+                if (handler.supports(type)) {
+                    handlerMap.put(type, handler);
+                }
+            }
+        }
+    }
+
     public void handleWalkCompleted(Walk walk) {
 
         Long userId = walk.getUser().getId();
@@ -33,18 +48,15 @@ public class MissionProcessor {
         for (UserMission userMission : missions) {
 
             MissionType type = userMission.getMission().getType();
+            MissionHandler handler = handlerMap.get(type);
 
-            handlers.stream()
-                    .filter(h -> h.supports(type))
-                    .findFirst()
-                    .ifPresent(handler -> {
+            if (handler != null) {
+                boolean isClear = handler.checkCompletion(userMission, walk);
 
-                        boolean isClear = handler.checkCompletion(userMission, walk);
-
-                        if (isClear) {
-                            completeMissionInternal(userMission);
-                        }
-                    });
+                if (isClear) {
+                    completeMissionInternal(userMission);
+                }
+            }
         }
     }
 

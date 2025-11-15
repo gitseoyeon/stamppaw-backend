@@ -1,13 +1,13 @@
-package org.example.stamppaw_backend.mission.service;
+package org.example.stamppaw_backend.user_mission.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.admin.mission.entity.Mission;
 import org.example.stamppaw_backend.admin.mission.repository.MissionRepository;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
-import org.example.stamppaw_backend.mission.dto.UserMissionDto;
-import org.example.stamppaw_backend.mission.entity.UserMission;
-import org.example.stamppaw_backend.mission.repository.UserMissionRepository;
+import org.example.stamppaw_backend.user_mission.dto.UserMissionDto;
+import org.example.stamppaw_backend.user_mission.entity.UserMission;
+import org.example.stamppaw_backend.user_mission.repository.UserMissionRepository;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.service.UserService;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,6 @@ public class UserMissionService {
 
     public UserMission createUserMission(Long userId, Long missionId) {
         User user = userService.getUserOrException(userId);
-
         Mission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
 

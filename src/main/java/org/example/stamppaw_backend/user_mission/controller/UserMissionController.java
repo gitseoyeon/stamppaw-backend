@@ -1,9 +1,8 @@
-package org.example.stamppaw_backend.mission.controller;
+package org.example.stamppaw_backend.user_mission.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.stamppaw_backend.mission.dto.UserMissionDto;
-import org.example.stamppaw_backend.mission.entity.UserMission;
-import org.example.stamppaw_backend.mission.service.UserMissionService;
+import org.example.stamppaw_backend.user_mission.dto.UserMissionDto;
+import org.example.stamppaw_backend.user_mission.service.UserMissionService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
