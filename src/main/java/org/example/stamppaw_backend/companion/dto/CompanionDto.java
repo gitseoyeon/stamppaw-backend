@@ -1,18 +1,24 @@
 package org.example.stamppaw_backend.companion.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.example.stamppaw_backend.companion.entity.CompanionApply;
+import lombok.NoArgsConstructor;
+import org.example.stamppaw_backend.companion.entity.Companion;
 import org.example.stamppaw_backend.companion.entity.RecruitmentStatus;
-
-import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CompanionDto {
     private String title;
-    private String content;
-    private String image;
-    private List<CompanionApply> applies;
     private RecruitmentStatus status;
+
+    public static CompanionDto from(Companion companion) {
+        return CompanionDto.builder()
+                .title(companion.getTitle())
+                .status(companion.getStatus())
+                .build();
+    }
 }

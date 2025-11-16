@@ -7,10 +7,11 @@ import org.example.stamppaw_backend.user.entity.User;
 
 @Entity
 @Table(name = "companion_apply")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
 public class CompanionApply extends BasicTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

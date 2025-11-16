@@ -10,6 +10,8 @@ import org.example.stamppaw_backend.companion.repository.CompanionReviewMappingR
 import org.example.stamppaw_backend.companion.repository.CompanionReviewRepository;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +46,23 @@ public class CompanionReviewService {
             mappingRepository.save(reviewMapping);
         }
     }
+
+    @Transactional(readOnly = true)
+    public Page<CompanionReviewResponse> getReceivedReviews(Pageable pageable, Long userId) {
+        User user = userService.getUserOrException(userId);
+        Page<CompanionReview> reviews = companionReviewRepository.findCompanionReviewByUser(pageable, user);
+
+        return reviews.map(CompanionReviewResponse::receivedFrom);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CompanionReviewResponse> getSendReviews(Pageable pageable, Long userId) {
+        User user = userService.getUserOrException(userId);
+        Page<CompanionReview> reviews = companionReviewRepository.findCompanionReviewByApplyUser(pageable, user);
+
+        return reviews.map(CompanionReviewResponse::sendFrom);
+    }
+
 
     private void verifyApplyUser(User user, CompanionApply companionApply) {
         if(!companionApply.getApplicant().equals(user)) {

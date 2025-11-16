@@ -1,14 +1,9 @@
 package org.example.stamppaw_backend.walk.controller;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.example.stamppaw_backend.walk.dto.request.WalkEndRequest;
-import org.example.stamppaw_backend.walk.dto.request.WalkPointRequest;
-import org.example.stamppaw_backend.walk.dto.request.WalkRecordRequest;
-import org.example.stamppaw_backend.walk.dto.request.WalkStartRequest;
-import org.example.stamppaw_backend.walk.dto.response.WalkEndResponse;
-import org.example.stamppaw_backend.walk.dto.response.WalkResponse;
-import org.example.stamppaw_backend.walk.dto.response.WalkStartResponse;
+import org.example.stamppaw_backend.user.service.CustomUserDetails;
+import org.example.stamppaw_backend.walk.dto.request.*;
+import org.example.stamppaw_backend.walk.dto.response.*;
 import org.example.stamppaw_backend.walk.service.WalkMapService;
 import org.example.stamppaw_backend.walk.service.WalkService;
 import org.springframework.data.domain.Page;
@@ -16,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
 
@@ -28,8 +24,11 @@ public class WalkController {
     private final WalkMapService walkMapService;
 
     @PostMapping("/start")
-    public ResponseEntity<WalkStartResponse> startWalk(@RequestBody WalkStartRequest request) {
-        WalkStartResponse response = walkService.startWalk(request);
+    public ResponseEntity<WalkStartResponse> startWalk(
+            @RequestBody WalkStartRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        WalkStartResponse response = walkService.startWalk(request, currentUser.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -72,11 +71,12 @@ public class WalkController {
 
     @GetMapping
     public ResponseEntity<Page<WalkResponse>> getUserWalksPaged(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<WalkResponse> walks = walkService.getUserWalks(pageable);
+        Page<WalkResponse> walks = walkService.getUserWalks(currentUser.getUser(), pageable);
         return ResponseEntity.ok(walks);
     }
 

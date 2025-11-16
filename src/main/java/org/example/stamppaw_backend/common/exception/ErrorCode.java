@@ -45,9 +45,16 @@ public enum ErrorCode {
     NOT_APPLY_USER(HttpStatus.NOT_FOUND, "동행 신청자가 아닙니다."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰 태그를 찾을 수 없습니다."),
 
-
     // Walk
     WALK_NOT_FOUND(HttpStatus.NOT_FOUND, "산책 기록을 찾을 수 없습니다."),
+
+    // Mission
+    MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "미션을 찾을 수 없습니다."),
+    MISSION_ALREADY_COMPLETED(HttpStatus.NOT_FOUND, "이미 완료된 미션입니다."),
+    INVALID_MISSION_TYPE(HttpStatus.NOT_FOUND, "미션 유형을 찾을 수 없습니다."),
+
+    // Point
+    POINT_NOT_FOUND(HttpStatus.NOT_FOUND, "포인트를 찾을 수 없습니다."),
 
     // File / S3
     FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 파일 업로드에 실패했습니다."),

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.stamppaw_backend.common.BasicTimeEntity;
-import org.example.stamppaw_backend.companion.dto.CompanionDto;
+import org.example.stamppaw_backend.companion.dto.CompanionManageDto;
 import org.example.stamppaw_backend.companion.dto.response.CompanionResponse;
 import org.example.stamppaw_backend.user.entity.User;
 
@@ -49,7 +49,7 @@ public class Companion extends BasicTimeEntity {
         this.status = RecruitmentStatus.ONGOING;
     }
 
-    public CompanionResponse updateCompanion(CompanionDto dto) {
+    public CompanionResponse updateCompanion(CompanionManageDto dto) {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         if(dto.getImage() != null) {
@@ -61,6 +61,10 @@ public class Companion extends BasicTimeEntity {
                 .content(content)
                 .image(imageUrl)
                 .build();
+    }
+
+    public void updateStatus(RecruitmentStatus status) {
+        this.status = status;
     }
 
 }

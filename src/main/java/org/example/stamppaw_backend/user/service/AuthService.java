@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.config.JwtTokenProvider;
 import org.example.stamppaw_backend.user.dto.request.LoginRequest;
 import org.example.stamppaw_backend.user.dto.request.SignupRequest;
+import org.example.stamppaw_backend.user.dto.response.LoginResponse;
+import org.example.stamppaw_backend.user.dto.response.UserDto;
 import org.example.stamppaw_backend.user.entity.Role;
 import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.repository.UserRepository;
@@ -43,7 +45,7 @@ public class AuthService {
     }
 
     // 로그인
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
@@ -51,7 +53,12 @@ public class AuthService {
             throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
         }
 
-        return jwtTokenProvider.createToken(user.getEmail(), user.getRole().name());
+        String token = jwtTokenProvider.createToken(user.getEmail(), user.getRole().name());
+
+        return LoginResponse.builder()
+                .token(token)
+                .user(UserDto.fromEntity(user))
+                .build();
     }
 }
 
