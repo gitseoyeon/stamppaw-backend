@@ -38,6 +38,7 @@ public class CartResponse {
         private Long id;
         private Long productId;
         private String productName;
+        private String mainImageUrl;
         private String optionSummary;
         private BigDecimal price; //상품 단가
         private Integer quantity;
@@ -48,6 +49,7 @@ public class CartResponse {
                     .id(item.getId())
                     .productId(item.getProduct().getId())
                     .productName(item.getProduct().getName())
+                    .mainImageUrl(item.getProduct().getMainImageUrl())
                     .optionSummary(item.getOptionSummary())
                     .price(item.getPrice())
                     .quantity(item.getQuantity())

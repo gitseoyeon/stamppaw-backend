@@ -16,7 +16,8 @@ import java.util.Set;
         indexes = {
                 @Index(name="idx_products_status", columnList="status")
         })
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor

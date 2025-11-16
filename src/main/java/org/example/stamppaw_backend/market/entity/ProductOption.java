@@ -16,7 +16,8 @@ import java.math.BigDecimal;
         indexes = {
                 @Index(name="idx_product_options_product", columnList="product_id")
         })
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
