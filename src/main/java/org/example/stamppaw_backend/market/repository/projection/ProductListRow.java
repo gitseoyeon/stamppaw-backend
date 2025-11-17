@@ -11,5 +11,6 @@ public interface ProductListRow {
     Category getCategory();
     ProductStatus getStatus();
     BigDecimal getPrice();
+    String getDescription();
     String getMainImageUrl();
 }

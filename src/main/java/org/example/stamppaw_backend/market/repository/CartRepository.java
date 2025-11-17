@@ -17,10 +17,9 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     boolean existsByUserId(Long userId);
 
-    @Query("SELECT c FROM Cart c " +
+    @Query("SELECT DISTINCT c FROM Cart c " +
             "LEFT JOIN FETCH c.cartItems ci " +
             "LEFT JOIN FETCH ci.product p " +
             "WHERE c.user.id = :userId")
     Optional<Cart> findByUserIdWithItems(@Param("userId") Long userId);
-
 }

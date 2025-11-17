@@ -11,7 +11,8 @@ import org.example.stamppaw_backend.common.BasicTimeEntity;
         indexes = {
                 @Index(name="idx_product_images_product", columnList="product_id")
         })
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor

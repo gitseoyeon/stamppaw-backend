@@ -15,8 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CartCreateRequest {
-    @NotNull
-    private Long userId;
 
     @Valid
     @Builder.Default
@@ -42,5 +40,6 @@ public class CartCreateRequest {
         private BigDecimal price;
 
         private String userImageUrl;
+        private String file;
     }
 }

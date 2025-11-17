@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -132,6 +134,33 @@ public class ProductService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Map<String, List<ProductListResponse>> getServiceProductsGrouped() {
+
+        List<ProductListResponse> products = productRepository
+                .findByStatus(ProductStatus.SERVICE)
+                .stream()
+                .map(ProductListResponse::fromEntity)
+                .toList();
+
+       // return products.stream().collect(Collectors.groupingBy(ProductListResponse::category));
+        return products.stream()
+                .collect(Collectors.groupingBy(ProductListResponse::category))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().stream().limit(2).toList()   // ⭐ 여기서 최대 2개 제한
+                ));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductListResponse> getProductsByCategory(Category category) {
+
+        return productRepository.findByCategoryAndStatusOrderByIdDesc(category, ProductStatus.SERVICE)
+                .stream()
+                .map(ProductListResponse::fromRow)
+                .toList();
+    }
 
     @Transactional(readOnly = true)
     public ProductDetailResponse getProductDetail(Long id) {
@@ -139,17 +168,6 @@ public class ProductService {
                 .orElseThrow(() -> new StampPawException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return ProductDetailResponse.fromEntity(product);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProductListResponse> getProductsByCategory(Category category) {
-
-        ProductStatus activeStatus = ProductStatus.SERVICE;
-
-        return productRepository.findByCategoryAndStatusOrderByIdDesc(category, activeStatus)
-                .stream()
-                .map(ProductListResponse::fromRow)
-                .toList();
     }
 
     @Transactional

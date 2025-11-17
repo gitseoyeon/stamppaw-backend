@@ -9,7 +9,8 @@ public record ProductListResponse(
         String category,
         String status,
         String price,
-        String mainImageUrl
+        String mainImageUrl,
+        String description
 ) {
     public static ProductListResponse fromEntity(Product product) {
         return new ProductListResponse(
@@ -18,7 +19,9 @@ public record ProductListResponse(
                 product.getCategory() != null ? product.getCategory().getLabel() : null, // enum label 출력
                 product.getStatus() != null ? product.getStatus().name() : null,
                 product.getPrice() != null ? product.getPrice().toPlainString() : null, // BigDecimal → String
-                product.getMainImageUrl()
+                product.getMainImageUrl(),
+                product.getDescription()
+
         );
     }
 
@@ -29,7 +32,8 @@ public record ProductListResponse(
                 row.getCategory() != null ? row.getCategory().getLabel() : null,
                 row.getStatus()   != null ? row.getStatus().name()   : null,
                 row.getPrice()    != null ? row.getPrice().toPlainString() : null,
-                row.getMainImageUrl()
+                row.getMainImageUrl(),
+                row.getDescription()
         );
     }
 

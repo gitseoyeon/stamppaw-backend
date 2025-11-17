@@ -25,7 +25,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createCart(
+    public ResponseEntity<OrderResponse> createOrder(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid OrderCreateRequest request
     ) {

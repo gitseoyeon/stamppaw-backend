@@ -49,7 +49,7 @@ public class CartService {
         User user = userService.getUserOrException(userId);
 
         // 장바구니 조회 or 생성
-        Cart cart = cartRepository.findByUser(user)
+        Cart cart = cartRepository.findByUserIdWithItems(userId) //findByUser(user)
                 .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
 
         for (CartCreateRequest.ItemDto itemDto : request.getItems()) {
@@ -57,9 +57,11 @@ public class CartService {
             Product product = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new StampPawException(ErrorCode.PRODUCT_NOT_FOUND));
 
-            //동일 상품 중복 방지: 이미 담겨있으면 수량만 증가
-            CartItem existing = cartItemRepository
-                    .findByCartIdAndProductId(cart.getId(), itemDto.getProductId())
+            //동일한 상품이 있는지 옵션 Summary 까지 비교하여 체크
+            CartItem existing = cart.getCartItems().stream()
+                    .filter(ci -> ci.getProduct().getId().equals(itemDto.getProductId()) &&
+                            ci.getOptionSummary().equals(itemDto.getOptionSummary()))
+                    .findFirst()
                     .orElse(null);
 
             if (existing != null) {
@@ -67,13 +69,9 @@ public class CartService {
                 existing.setSubtotal(
                         existing.getPrice().multiply(BigDecimal.valueOf(existing.getQuantity()))
                 );
-                cartItemRepository.save(existing);
                 continue;
             }
 
-            //사용자 이미지가 널이 아닐경우 이미지 업로드 추가
-
-            //CartItem 생성
             CartItem newItem = CartItem.builder()
                     .cart(cart)
                     .product(product)
@@ -84,10 +82,13 @@ public class CartService {
                     .userImageUrl(itemDto.getUserImageUrl())
                     .build();
 
-            cartItemRepository.save(newItem);
+            cart.getCartItems().add(newItem);
         }
 
-        return cart;
+        cartRepository.save(cart);
+
+        return cartRepository.findByUserIdWithItems(userId)
+                .orElse(cart);
     }
 
     @Transactional
