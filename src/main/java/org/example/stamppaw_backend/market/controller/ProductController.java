@@ -45,7 +45,7 @@ public class ProductController {
         return productService.getProductsByCategory(category);
     }
 
-    @GetMapping("/categories")
+    @GetMapping("/products/categories")
     public ResponseEntity<List<CategoryResponse>> getCategories() {
 
         List<CategoryResponse> categories = Arrays.stream(Category.values())

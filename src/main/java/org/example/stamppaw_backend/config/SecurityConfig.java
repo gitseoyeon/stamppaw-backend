@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/companion/**").permitAll()
+                        .requestMatchers("/api/market/products/**").permitAll()
                         .requestMatchers("/admin/**").permitAll() // 관리자 임시허용
                         .requestMatchers("/ws-stomp/**", "/ws-stomp").permitAll()
                         .anyRequest().authenticated()
