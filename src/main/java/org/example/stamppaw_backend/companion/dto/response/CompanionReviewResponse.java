@@ -14,12 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanionReviewResponse {
+    private Long id;
     private String title;
     private UserDto user;
     private List<String> tags;
 
     public static CompanionReviewResponse receivedFrom(CompanionReview companionReview) {
         return CompanionReviewResponse.builder()
+                .id(companionReview.getApply().getCompanion().getId())
                 .title(companionReview.getApply().getCompanion().getTitle())
                 .user(UserDto.fromEntity(companionReview.getApply().getApplicant()))
                 .tags(companionReview.getTags().stream()
@@ -30,6 +32,7 @@ public class CompanionReviewResponse {
 
     public static CompanionReviewResponse sendFrom(CompanionReview companionReview) {
         return CompanionReviewResponse.builder()
+                .id(companionReview.getApply().getCompanion().getId())
                 .title(companionReview.getApply().getCompanion().getTitle())
                 .user(UserDto.fromEntity(companionReview.getApply().getCompanion().getUser()))
                 .tags(companionReview.getTags().stream()

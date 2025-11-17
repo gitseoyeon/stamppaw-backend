@@ -23,6 +23,7 @@ import java.util.List;
 public class CompanionApplyService {
     private final CompanionApplyRepository companionApplyRepository;
     private final UserService userService;
+    private final CompanionReviewService companionReviewService;
 
     public void saveCompanionApply(User user, Companion companion) {
         isAlreadyApply(user, companion.getApplies());
@@ -52,12 +53,11 @@ public class CompanionApplyService {
     public Page<CompanionUserApplyResponse> getUserApply(Pageable pageable, Long userId) {
         User user = userService.getUserOrException(userId);
         Page<CompanionApply> applies = companionApplyRepository.findCompanionApplyByApplicant(user, pageable);
-        return applies.map(CompanionUserApplyResponse::from);
-    }
 
-    public CompanionApply getApplyOrException(Long applyId) {
-        return companionApplyRepository.findById(applyId)
-                .orElseThrow(() -> new StampPawException(ErrorCode.APPLY_NOT_FOUND));
+        return applies.map(apply -> {
+            boolean reviewWritten = companionReviewService.isExistReview(apply.getId());
+            return CompanionUserApplyResponse.from(apply, reviewWritten);
+        });
     }
 
     private void isAlreadyApply(User user, List<CompanionApply> applies) {

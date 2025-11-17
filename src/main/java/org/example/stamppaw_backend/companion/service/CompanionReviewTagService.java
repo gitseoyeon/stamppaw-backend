@@ -17,6 +17,7 @@ import java.util.List;
 public class CompanionReviewTagService {
     private final CompanionReviewTagRepository reviewTagRepository;
 
+    @Transactional(readOnly = true)
     public List<CompanionReviewTag> getTags(List<Long> list) {
         List<CompanionReviewTag> companionReviewTags = new ArrayList<>();
         for(Long id : list) {
@@ -24,6 +25,11 @@ public class CompanionReviewTagService {
         }
 
         return companionReviewTags;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompanionReviewTag> getAllTags() {
+        return reviewTagRepository.findAll();
     }
 
     public CompanionReviewTag getTagOrException(Long id) {

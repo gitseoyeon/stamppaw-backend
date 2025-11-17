@@ -6,6 +6,7 @@ import org.example.stamppaw_backend.common.exception.StampPawException;
 import org.example.stamppaw_backend.companion.dto.request.CompanionReviewCreateRequest;
 import org.example.stamppaw_backend.companion.dto.response.CompanionReviewResponse;
 import org.example.stamppaw_backend.companion.entity.*;
+import org.example.stamppaw_backend.companion.repository.CompanionApplyRepository;
 import org.example.stamppaw_backend.companion.repository.CompanionReviewMappingRepository;
 import org.example.stamppaw_backend.companion.repository.CompanionReviewRepository;
 import org.example.stamppaw_backend.user.entity.User;
@@ -23,13 +24,14 @@ import java.util.List;
 public class CompanionReviewService {
     private final CompanionReviewRepository companionReviewRepository;
     private final UserService userService;
-    private final CompanionApplyService companionApplyService;
+    private final CompanionApplyRepository companionApplyRepository;
     private final CompanionReviewTagService companionReviewTagService;
     private final CompanionReviewMappingRepository mappingRepository;
 
     public void createReview(CompanionReviewCreateRequest request, Long applyId, Long userId) {
         User user = userService.getUserOrException(userId);
-        CompanionApply companionApply = companionApplyService.getApplyOrException(applyId);
+        CompanionApply companionApply = companionApplyRepository.findById(applyId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.APPLY_NOT_FOUND));
         verifyApplyUser(user, companionApply);
 
         CompanionReview review = CompanionReview.builder()
@@ -45,6 +47,9 @@ public class CompanionReviewService {
                     .build();
             mappingRepository.save(reviewMapping);
         }
+
+        user.addPoint(1);
+
     }
 
     @Transactional(readOnly = true)
@@ -61,6 +66,10 @@ public class CompanionReviewService {
         Page<CompanionReview> reviews = companionReviewRepository.findCompanionReviewByApplyUser(pageable, user);
 
         return reviews.map(CompanionReviewResponse::sendFrom);
+    }
+
+    public boolean isExistReview(Long applyId) {
+        return companionReviewRepository.existsByApply_Id(applyId);
     }
 
 

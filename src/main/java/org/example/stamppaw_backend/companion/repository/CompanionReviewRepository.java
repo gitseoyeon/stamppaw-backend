@@ -16,4 +16,6 @@ public interface CompanionReviewRepository extends JpaRepository<CompanionReview
 
     @Query("SELECT r FROM CompanionReview r WHERE r.apply.applicant = :user")
     Page<CompanionReview> findCompanionReviewByApplyUser(Pageable pageable, @Param("user") User user);
+
+    boolean existsByApply_Id(Long applyId);
 }

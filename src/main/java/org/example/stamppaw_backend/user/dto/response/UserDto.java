@@ -16,7 +16,7 @@ public class UserDto {
     private String email;
     private String age;
     private String region;
-    private String nickName;
+    private String nickname;
     private String bio;
 
     public static UserDto fromEntity(User user) {
@@ -26,7 +26,7 @@ public class UserDto {
                 .email(user.getEmail())
                 .age(user.getAge())
                 .region(user.getRegion())
-                .nickName(user.getNickname())
+                .nickname(user.getNickname())
                 .bio(user.getBio())
                 .build();
     }
