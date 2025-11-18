@@ -55,9 +55,9 @@ public class CompanionController {
 
     @PatchMapping("/{postId}")
     public CompanionResponse modifyCompanion(@PathVariable Long postId,
-                                             @AuthenticationPrincipal User user,
+                                             @AuthenticationPrincipal CustomUserDetails userDetails,
                                              @Valid CompanionUpdateRequest request) {
-        return companionService.modifyCompanion(postId, user.getId(), request);
+        return companionService.modifyCompanion(postId, userDetails.getUser().getId(), request);
     }
 
     @DeleteMapping("/{postId}")
