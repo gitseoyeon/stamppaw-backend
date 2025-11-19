@@ -2,12 +2,11 @@ package org.example.stamppaw_backend.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 import java.util.Collection;
-
+import org.example.stamppaw_backend.dog.entity.Dog;
 import org.example.stamppaw_backend.point.entity.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,6 +38,7 @@ public class User implements UserDetails {
     private String nickname;
     private String region;
     private String bio;
+    private String profileImage;
     private long totalPoint;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -82,5 +82,4 @@ public class User implements UserDetails {
     public void addPoint(int point) {
         this.totalPoint += point;
     }
-
 }

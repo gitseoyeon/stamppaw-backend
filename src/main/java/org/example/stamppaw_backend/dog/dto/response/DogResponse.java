@@ -1,6 +1,5 @@
 package org.example.stamppaw_backend.dog.dto.response;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,16 +15,16 @@ public class DogResponse {
     private String breed;
     private int age;
     private String character;
-    private String image_Url;
+    private String imageUrl;
 
     public static DogResponse from(Dog dog) {
         return DogResponse.builder()
-                .id(dog.getId())
-                .name(dog.getName())
-                .breed(dog.getBreed())
-                .age(dog.getAge())
-                .character(dog.getCharacter())
-                .image_Url(dog.getImage_url())
-                .build();
+            .id(dog.getId())
+            .name(dog.getName())
+            .breed(dog.getBreed())
+            .age(dog.getAge())
+            .character(dog.getCharacter())
+            .imageUrl(dog.getImage_url())
+            .build();
     }
 }

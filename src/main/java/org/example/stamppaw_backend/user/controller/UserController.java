@@ -1,12 +1,12 @@
 package org.example.stamppaw_backend.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.stamppaw_backend.user.dto.request.UserUpdateRequest;
 import org.example.stamppaw_backend.user.dto.response.UserResponseDto;
 import org.example.stamppaw_backend.user.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,9 +22,14 @@ public class UserController {
     }
 
     // 내 정보 수정
-    @PatchMapping("/me")
-    public UserResponseDto updateMyInfo(@AuthenticationPrincipal UserDetails userDetails,
-        @RequestBody UserUpdateRequest request) {
-        return userService.updateMyInfo(userDetails, request);
+    @PatchMapping(value = "/me")
+    public UserResponseDto updateMyInfo(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestPart(value = "nickname", required = false) String nickname,
+        @RequestPart(value = "bio", required = false) String bio,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage
+    ) {
+        return userService.updateMyInfo(userDetails, nickname, bio, profileImage);
     }
+
 }
