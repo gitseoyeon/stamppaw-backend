@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      th:replace="~{admin/layout :: layout('제목', ~{::content}, ~{::scripts})}">
+<body>
+<div th:fragment="content">
+
+    <div class="page-header">
+        <h2>미션 생성</h2>
+        <a th:href="@{/admin/missions}" class="btn-third">← 돌아가기</a>
+    </div>
+
+    <div style="margin: 0 15px;">
+
+        <div>
+            <label>미션 타입</label>
+            <select id="missionType" onchange="onTypeChange()">
+
+                <option th:each="type : ${missionTypes}"
+                        th:if="${usedTypes == null or !usedTypes.contains(type)}"
+                        th:value="${type}"
+                        th:text="${type}">
+                </option>
+
+            </select>
+        </div>
+
+        <div>
+            <label>내용</label>
+            <input id="content" type="text" placeholder="미션 내용 입력">
+        </div>
+
+        <div>
+            <label>포인트</label>
+            <input id="point" type="number" placeholder="포인트">
+        </div>
+
+        <!-- 거리 미션 -->
+        <div id="distanceField" style="display:none;">
+            <label>목표 거리 (m)</label>
+            <input id="targetDistance" type="number">
+        </div>
+
+        <!-- 시간 미션 -->
+        <div id="timeField" style="display:none;">
+            <label>목표 시간 (초)</label>
+            <input id="targetTime" type="number">
+        </div>
+
+        <br>
+
+        <button class="btn-primary btn-lg" onclick="createMission()">미션 생성</button>
+    </div>
+
+</div>
+
+<div th:fragment="scripts">
+    <script>
+    function onTypeChange() {
+        const type = document.getElementById("missionType").value;
+        document.getElementById("distanceField").style.display = 'none';
+        document.getElementById("timeField").style.display = 'none';
+
+        if (type === "WALK_DISTANCE") document.getElementById("distanceField").style.display = 'block';
+        if (type === "WALK_TIME") document.getElementById("timeField").style.display = 'block';
+    }
+
+    async function createMission() {
+        const type = document.getElementById("missionType").value;
+        const payload = {
+            type: type,
+            content: document.getElementById("content").value,
+            point: parseInt(document.getElementById("point").value)
+        };
+
+        if (type === "WALK_DISTANCE") {
+            payload.targetDistance = parseInt(document.getElementById("targetDistance").value);
+        }
+
+        if (type === "WALK_TIME") {
+            payload.targetTime = parseInt(document.getElementById("targetTime").value);
+        }
+
+        const res = await fetch('/api/admin/missions', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            alert('미션이 생성되었습니다.');
+            window.location.href = '/admin/missions';
+        } else {
+            alert('미션 생성 실패');
+        }
+    }
+    </script>
+</div>
+
+</body>
+</html>

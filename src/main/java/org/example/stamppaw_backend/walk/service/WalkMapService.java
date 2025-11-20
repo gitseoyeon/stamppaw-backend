@@ -3,6 +3,7 @@ package org.example.stamppaw_backend.walk.service;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
+import org.example.stamppaw_backend.common.util.DistanceCalculator;
 import org.example.stamppaw_backend.walk.dto.request.WalkPointRequest;
 import org.example.stamppaw_backend.walk.dto.response.WalkPointResponse;
 import org.example.stamppaw_backend.walk.entity.Walk;
@@ -62,24 +63,17 @@ public class WalkMapService {
         if (points == null || points.size() < 2) return 0.0;
 
         double total = 0.0;
+
         for (int i = 1; i < points.size(); i++) {
             WalkPointResponse p1 = points.get(i - 1);
             WalkPointResponse p2 = points.get(i);
-            total += calcDistance(p1.getLat(), p1.getLng(), p2.getLat(), p2.getLng());
+
+            total += DistanceCalculator.distanceMeters(
+                    p1.getLat(), p1.getLng(),
+                    p2.getLat(), p2.getLng()
+            );
         }
+
         return total;
-    }
-
-    private double calcDistance(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371000;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
     }
 }

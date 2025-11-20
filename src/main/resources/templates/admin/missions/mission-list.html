@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('제목', ~{::content}, ~{::scripts})}">
+<body>
+<div th:fragment="content">
+
+    <div class="page-header">
+        <h2>미션 목록</h2>
+        <!--        <a th:href="@{/admin/missions/create}" class="btn-primary btn-lg">미션 생성</a>-->
+        <button class="btn-primary" onclick="assignToday()">
+            전체 유저에게 미션 즉시 할당
+        </button>
+    </div>
+
+    <div style="margin: 0 15px;">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>타입</th>
+                <th>내용</th>
+                <th>포인트</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="mission : ${missions}">
+                <td th:text="${mission.id}"></td>
+                <td th:text="${mission.type}"></td>
+                <td th:text="${mission.content}"></td>
+                <td th:text="${mission.point} + ' P'"></td>
+                <td>
+                    <a th:href="@{|/admin/missions/${mission.id}/edit|}"
+                       class="btn-third">수정</a>
+
+                    <!--                    <a th:onclick="@{|deleteMission(${mission.id})|}" class="btn-third">삭제</a>-->
+
+                    <button class="btn-primary"
+                            th:onclick="'assignMission(' + ${mission.id} + ')'">
+                        할당
+                    </button>
+                </td>
+            </tr>
+
+            <tr th:if="${missions.size() == 0}">
+                <td colspan="5" class="text-center">등록된 미션이 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:fragment="scripts">
+    <script>
+        async function assignMission(missionId) {
+
+            const userId = prompt("할당할 사용자 ID를 입력하세요 (테스트면 1 입력):");
+
+            if (!userId) return;
+
+            const res = await fetch(`/api/admin/missions/${userId}/assign/${missionId}`, {
+                method: "POST"
+            });
+
+            if (res.ok) {
+                alert("미션이 유저에게 할당되었습니다!");
+            } else {
+                alert("할당 실패!");
+            }
+        }
+
+        async function assignToday() {
+
+            if (!confirm("전체 유저에게 오늘의 미션을 즉시 생성할까요?")) return;
+
+            const res = await fetch("/api/admin/missions/assign-today", {
+                method: "POST"
+            });
+
+            if (res.ok) {
+                alert("전체 유저에게 미션이 즉시 할당되었습니다!");
+            } else {
+                alert("미션 할당 실패!");
+            }
+        }
+
+<!--    async function deleteMission(id) {-->
+<!--        if (!confirm("정말 삭제하시겠습니까?")) return;-->
+
+<!--        const res = await fetch('/api/admin/missions/' + id, {-->
+<!--            method: 'DELETE'-->
+<!--        });-->
+
+<!--        if (res.ok) {-->
+<!--            alert("삭제되었습니다.");-->
+<!--            window.location.reload();-->
+<!--        } else {-->
+<!--            alert("삭제 실패");-->
+<!--        }-->
+<!--    }-->
+    </script>
+</div>
+
+</body>
+</html>

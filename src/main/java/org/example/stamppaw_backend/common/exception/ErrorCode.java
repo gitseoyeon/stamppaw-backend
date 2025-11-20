@@ -49,11 +49,18 @@ public enum ErrorCode {
 
     // Walk
     WALK_NOT_FOUND(HttpStatus.NOT_FOUND, "산책 기록을 찾을 수 없습니다."),
+    UNAUTHORIZED_WALK_EDIT(HttpStatus.FORBIDDEN, "본인의 산책 기록만 수정할 수 있습니다."),
+    UNAUTHORIZED_WALK_DELETE(HttpStatus.FORBIDDEN, "본인의 산책 기록만 삭제할 수 있습니다."),
+    UNAUTHORIZED_WALK_ACCESS(HttpStatus.FORBIDDEN, "본인의 산책 기록만 조회할 수 있습니다."),
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "요청값이 올바르지 않습니다."),
+    INVALID_WALK_STATUS(HttpStatus.BAD_REQUEST, "현재 상태에서는 해당 작업을 수행할 수 없습니다."),
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "미션을 찾을 수 없습니다."),
     MISSION_ALREADY_COMPLETED(HttpStatus.NOT_FOUND, "이미 완료된 미션입니다."),
     INVALID_MISSION_TYPE(HttpStatus.NOT_FOUND, "미션 유형을 찾을 수 없습니다."),
+    MISSION_ALREADY_EXISTS(HttpStatus.NOT_FOUND, "미션타입 당 하나만 작성 가능합니다."),
+    INVALID_MISSION_TYPE_CHANGE(HttpStatus.NOT_FOUND, "미션타입은 변경할 수 없습니다."),
 
     // Point
     POINT_NOT_FOUND(HttpStatus.NOT_FOUND, "포인트를 찾을 수 없습니다."),

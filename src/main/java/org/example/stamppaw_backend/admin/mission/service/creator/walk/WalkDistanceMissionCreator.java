@@ -23,4 +23,11 @@ public class WalkDistanceMissionCreator implements MissionCreator<WalkDistanceMi
                 .targetDistance(req.getTargetDistance())
                 .build();
     }
+
+    @Override
+    public void update(Mission mission, WalkDistanceMissionRequest req) {
+        mission.setContent(req.getContent());
+        mission.setPoint(req.getPoint());
+        mission.setTargetDistance(req.getTargetDistance());
+    }
 }

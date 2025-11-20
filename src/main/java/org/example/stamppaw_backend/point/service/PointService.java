@@ -24,7 +24,7 @@ public class PointService {
     private final PointRepository pointRepository;
     private final UserService userService;
 
-    // 1) 일반 포인트 지급
+    // 포인트 지급
     public PointResponse addPoint(Long userId, PointRequest request) {
         User user = userService.getUserOrException(userId);
 
@@ -38,27 +38,6 @@ public class PointService {
                 .reason(reason)
                 .user(user)
                 .userMission(null) // 미션 없음
-                .build();
-
-        Point saved = pointRepository.save(point);
-
-        return new PointResponse(saved.getId(), saved.getAmount(), saved.getReason());
-    }
-
-    // 2) 미션 보상 포인트 지급
-    public PointResponse addPointForMission(UserMission userMission, PointRequest request) {
-        User user = userMission.getUser();
-
-        int amount = request.getAmount();
-        MissionType reason = request.getReason();
-
-        user.setTotalPoint(user.getTotalPoint() + amount);
-
-        Point point = Point.builder()
-                .amount(amount)
-                .reason(reason)
-                .user(user)
-                .userMission(userMission)
                 .build();
 
         Point saved = pointRepository.save(point);

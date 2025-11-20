@@ -7,4 +7,5 @@ import org.example.stamppaw_backend.user_mission.entity.MissionType;
 public interface MissionCreator<T extends MissionRequest> {
     MissionType supports();
     Mission create(T request);
+    void update(Mission mission, T request);
 }

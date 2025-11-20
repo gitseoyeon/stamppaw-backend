@@ -44,7 +44,8 @@ public class WalkController {
     @PostMapping("/{walkId}/end")
     public ResponseEntity<WalkEndResponse> endWalk(
             @PathVariable Long walkId,
-            @RequestBody WalkEndRequest request
+            @RequestBody WalkEndRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
         WalkEndResponse response = walkService.endWalk(walkId, request);
         return ResponseEntity.ok(response);
@@ -53,10 +54,11 @@ public class WalkController {
     @PutMapping("/{walkId}/record")
     public ResponseEntity<WalkResponse> recordWalk(
             @PathVariable Long walkId,
-            @ModelAttribute WalkRecordRequest request
+            @ModelAttribute WalkRecordRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
         try {
-            WalkResponse response = walkService.editWalk(walkId, request);
+            WalkResponse response = walkService.editWalk(walkId, request, currentUser.getUser());
             return ResponseEntity.ok(response);
         } catch (MultipartException e) {
             return ResponseEntity.badRequest().build();
@@ -64,8 +66,11 @@ public class WalkController {
     }
 
     @GetMapping("/{walkId}")
-    public ResponseEntity<WalkResponse> getWalkDetail(@PathVariable Long walkId) {
-        WalkResponse response = walkService.getWalkDetail(walkId);
+    public ResponseEntity<WalkResponse> getWalkDetail(
+            @PathVariable Long walkId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        WalkResponse response = walkService.getWalkDetail(walkId, currentUser.getUser());
         return ResponseEntity.ok(response);
     }
 
@@ -81,8 +86,11 @@ public class WalkController {
     }
 
     @DeleteMapping("/{walkId}")
-    public ResponseEntity<Void> deleteWalk(@PathVariable Long walkId) {
-        walkService.deleteWalk(walkId);
+    public ResponseEntity<Void> deleteWalk(
+            @PathVariable Long walkId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        walkService.deleteWalk(walkId, currentUser.getUser());
         return ResponseEntity.ok().build();
     }
 }

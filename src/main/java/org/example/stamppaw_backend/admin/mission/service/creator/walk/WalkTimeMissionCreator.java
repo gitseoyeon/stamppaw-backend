@@ -23,4 +23,11 @@ public class WalkTimeMissionCreator implements MissionCreator<WalkTimeMissionReq
                 .targetTime(req.getTargetTime())
                 .build();
     }
+
+    @Override
+    public void update(Mission mission, WalkTimeMissionRequest req) {
+        mission.setContent(req.getContent());
+        mission.setPoint(req.getPoint());
+        mission.setTargetTime(req.getTargetTime());
+    }
 }

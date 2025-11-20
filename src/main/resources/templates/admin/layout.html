@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:fragment="layout(title, content)">  <!-- ★ 레이아웃 프래그먼트 선언 -->
+      th:fragment="layout(title, content, scripts)">  <!-- ★ 레이아웃 프래그먼트 선언 -->
 <head>
   <meta charset="UTF-8" />
   <title th:text="${title} ?: 'StampPaw Admin'">StampPaw Admin</title>
@@ -21,5 +21,8 @@
 </header>
 
 <main class="admin-content" th:replace="${content}">컨텐츠 로드 중...</main>
+
+<div th:replace="${scripts}"></div>
+
 </body>
 </html>

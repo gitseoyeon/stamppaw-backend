@@ -45,6 +45,11 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
+        // JSON 직렬화
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         // 커스텀 ObjectMapper를 사용하는 Jackson2JsonRedisSerializer
         Jackson2JsonRedisSerializer<Object> serializer =
                 new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);

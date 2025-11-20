@@ -22,4 +22,10 @@ public class WalkCompleteMissionCreator implements MissionCreator<WalkCompleteMi
                 .point(req.getPoint())
                 .build();
     }
+
+    @Override
+    public void update(Mission mission, WalkCompleteMissionRequest req) {
+        mission.setContent(req.getContent());
+        mission.setPoint(req.getPoint());
+    }
 }

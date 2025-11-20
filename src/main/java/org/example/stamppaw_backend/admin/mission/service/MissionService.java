@@ -38,6 +38,10 @@ public class MissionService {
 
         MissionType type = req.getType();
 
+        if (missionRepository.existsByType(type)) {
+            throw new StampPawException(ErrorCode.MISSION_ALREADY_EXISTS);
+        }
+
         MissionCreator creator = creatorMap.get(type);
         if (creator == null) {
             throw new StampPawException(ErrorCode.INVALID_MISSION_TYPE);
@@ -61,9 +65,36 @@ public class MissionService {
         return MissionDto.fromEntity(mission);
     }
 
-    public void deleteMission(Long id) {
+    public List<MissionType> getUsedMissionTypes() {
+        return missionRepository.findDistinctTypes();
+    }
+
+    @Transactional
+    public MissionDto updateMission(Long id, MissionRequest req) {
+
         Mission mission = missionRepository.findById(id)
                 .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
-        missionRepository.delete(mission);
+
+        if (mission.getType() != req.getType()) {
+            throw new StampPawException(ErrorCode.INVALID_MISSION_TYPE_CHANGE);
+        }
+
+        MissionCreator creator = creatorMap.get(req.getType());
+        if (creator == null) {
+            throw new StampPawException(ErrorCode.INVALID_MISSION_TYPE);
+        }
+
+        creator.update(mission, req);
+
+        missionRepository.save(mission);
+
+        return MissionDto.fromEntity(mission);
     }
+
+
+//    public void deleteMission(Long id) {
+//        Mission mission = missionRepository.findById(id)
+//                .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
+//        missionRepository.delete(mission);
+//    }
 }

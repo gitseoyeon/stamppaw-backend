@@ -48,9 +48,9 @@ public class UserMissionService {
                 .toList();
     }
 
-    // 관리자 or 유저가 직접 미션 완료
+    @Transactional
+    // 관리자가 직접 미션 완료
     public UserMissionDto completeMission(Long userMissionId) {
-
         UserMission userMission = userMissionRepository.findById(userMissionId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.MISSION_NOT_FOUND));
 
@@ -63,5 +63,4 @@ public class UserMissionService {
 
         return UserMissionDto.fromEntity(userMission);
     }
-
 }
