@@ -2,6 +2,7 @@ package org.example.stamppaw_backend.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.user.dto.response.UserResponseDto;
+import org.example.stamppaw_backend.user.service.CustomUserDetails;
 import org.example.stamppaw_backend.user.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,5 +32,14 @@ public class UserController {
     ) {
         return userService.updateMyInfo(userDetails, nickname, bio, profileImage);
     }
+
+    @GetMapping("/{id}")
+    public UserResponseDto getUserProfile(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PathVariable Long id
+    ) {
+        return userService.getUserProfile(userDetails.getUser(), id);
+    }
+
 
 }
