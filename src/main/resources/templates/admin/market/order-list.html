@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('주문/결제 목록', ~{::content}, ~{::scripts})}">
+<body>
+<div th:fragment="content">
+
+  <div class="page-header">
+    <h2>주문/결제 목록</h2>
+  </div>
+
+  <!-- 주문 상태 필터 -->
+  <form th:action="@{/admin/market/orders}" method="get"
+        class="search-form"
+        style="display:flex; align-items:center; gap:10px; margin: 0 15px 20px;">
+
+    <!-- 라벨 -->
+    <label for="status" style="font-weight:600; font-size:14px;">
+      주문상태
+    </label>
+
+    <!-- select 박스 -->
+    <select id="status" name="status"
+            style="padding:6px 10px; border:1px solid #ccc; border-radius:6px; width:150px;">
+      <option th:value="${null}"
+              th:selected="${selectedStatus == null}">
+        전체
+      </option>
+      <option th:each="st : ${T(org.example.stamppaw_backend.market.entity.OrderStatus).values()}"
+              th:value="${st}"
+              th:selected="${selectedStatus == st}"
+              th:text="${st}">
+      </option>
+    </select>
+
+    <!-- 검색 버튼 -->
+    <button class="btn btn-primary"
+            style="padding:6px 14px; height:36px;">
+      검색
+    </button>
+  </form>
+
+
+  <div style="margin: 0px 15px;">
+    <table class="admin-table">
+      <thead>
+      <tr>
+        <th>주문번호</th>
+        <th>주문자</th>
+        <th>총 금액</th>
+        <th>주문일</th>
+        <th>주문상태</th>
+        <th>배송상태</th>
+        <th>관리</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="order : ${orders.content}">
+        <td th:text="${order.orderId}"></td>
+        <td th:text="${order.username}"></td>
+        <td th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA')} + ' 원'"></td>
+        <td th:text="${#temporals.format(order.registeredAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${order.status}"></td>
+        <td th:text="${order.shippingStatus}"></td>
+        <td>
+          <a th:href="@{'/admin/market/orders/' + ${order.orderId}}" class="btn btn-primary btn-sm">
+            상세보기
+          </a>
+        </td>
+      </tr>
+
+      <tr th:if="${orders.totalElements == 0}">
+        <td colspan="7" class="text-center">주문 내역이 없습니다.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="pagination" style="text-align:center; margin-top:20px;">
+    <a th:if="${orders.hasPrevious()}"
+       th:href="@{/admin/market/orders(page=${orders.number - 1}, status=${selectedStatus})}">
+      이전
+    </a>
+
+    <span th:each="p : ${#numbers.sequence(0, orders.totalPages - 1)}"
+          th:classappend="${p == orders.number} ? 'active'">
+            <a th:href="@{/admin/market/orders(page=${p}, status=${selectedStatus})}"
+               th:text="${p + 1}">
+            </a>
+        </span>
+
+    <a th:if="${orders.hasNext()}"
+       th:href="@{/admin/market/orders(page=${orders.number + 1}, status=${selectedStatus})}">
+      다음
+    </a>
+  </div>
+
+</div>
+
+<!-- scripts fragment(비어있어도 반드시 필요) -->
+<th:block th:fragment="scripts"></th:block>
+
+</body>
+</html>
