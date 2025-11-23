@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OrderItemResponse {
     private Long itemId;
+    private String optionSummary;
     private Long productId;
     private String productName;
     private String mainImageUrl;
@@ -25,6 +26,7 @@ public class OrderItemResponse {
     public static OrderItemResponse fromEntity(OrderItem item) {
         return OrderItemResponse.builder()
                 .itemId(item.getId())
+                .optionSummary(item.getOptionSummary())
                 .productId(item.getProduct().getId())
                 .productName(item.getProduct().getName())
                 .mainImageUrl(item.getProduct().getMainImageUrl())

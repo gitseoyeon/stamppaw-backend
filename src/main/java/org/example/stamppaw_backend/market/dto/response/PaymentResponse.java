@@ -26,6 +26,5 @@ public class PaymentResponse {
                 .orderId(payment.getOrder().getId())
                 .build();
     }
-
 }
 

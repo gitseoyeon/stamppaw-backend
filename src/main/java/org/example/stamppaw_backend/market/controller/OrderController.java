@@ -3,6 +3,7 @@ package org.example.stamppaw_backend.market.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.stamppaw_backend.market.dto.request.OrderCreateRequest;
+import org.example.stamppaw_backend.market.dto.response.OrderDetailResponse;
 import org.example.stamppaw_backend.market.dto.response.OrderItemResponse;
 import org.example.stamppaw_backend.market.dto.response.OrderListResponse;
 import org.example.stamppaw_backend.market.dto.response.OrderResponse;
@@ -44,16 +45,18 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/{orderId}/items")
-    public ResponseEntity<List<OrderItemResponse>> getOrderItems(
+    @GetMapping("/{orderId}/detail")
+    public ResponseEntity<OrderDetailResponse> getOrderDetail(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long orderId
     ) {
+        Long userId = userDetails.getUser().getId();
 
-        List<OrderItemResponse> items = orderService.getOrderItemsByOrderId(userDetails.getUser().getId(), orderId);
+        OrderDetailResponse response = orderService.getOrderDetail(userId, orderId);
 
-        return ResponseEntity.ok(items);
+        return ResponseEntity.ok(response);
     }
+
 
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<Void> updateOrderStatus(

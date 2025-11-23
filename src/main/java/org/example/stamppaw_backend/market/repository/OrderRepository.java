@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository  extends JpaRepository<Order, Long> {
 
@@ -69,4 +70,14 @@ public interface OrderRepository  extends JpaRepository<Order, Long> {
             @Param("orderId") Long orderId,
             @Param("shippingStatus")ShippingStatus shippingStatus
     );
+
+    @Query("""
+        SELECT o FROM Order o
+        left join fetch o.orderItems oi
+        left join fetch oi.product p
+        left join fetch o.payment pay
+        where o.id = :orderId
+    """)
+    Optional<Order> findDetailByOrderId(@Param("orderId") Long orderId);
+
 }

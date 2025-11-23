@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
 import org.example.stamppaw_backend.market.dto.request.OrderCreateRequest;
+import org.example.stamppaw_backend.market.dto.response.OrderDetailResponse;
 import org.example.stamppaw_backend.market.dto.response.OrderItemResponse;
 import org.example.stamppaw_backend.market.dto.response.OrderListResponse;
 import org.example.stamppaw_backend.market.dto.response.OrderResponse;
@@ -137,21 +138,48 @@ public class OrderService {
         );
     }
 
-    public List<OrderItemResponse> getOrderItemsByOrderId(Long userId, Long orderId) {
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetail(Long userId, Long orderId) {
 
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findDetailByOrderId(orderId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.ORDER_NOT_FOUND));
 
-        Long ownerId = order.getUser().getId();
-        if (!ownerId.equals(userId)) {
+        if (!order.getUser().getId().equals(userId)) {
             throw new StampPawException(ErrorCode.UNAUTHORIZED_ORDER_ACCESS);
         }
 
-        return orderItemRepository.findByOrderId(orderId)
-                .stream()
-                .map(OrderItemResponse::fromEntity)
-                .toList();
+        // 결제 정보 매핑
+        Payment payment = order.getPayment();
+        OrderDetailResponse.PaymentInfo paymentInfo = null;
+        if (payment != null) {
+            paymentInfo = OrderDetailResponse.PaymentInfo.builder()
+                    .paymentKey(payment.getPaymentKey())
+                    .tossOrderId(payment.getTossOrderId())
+                    .method(payment.getMethod())
+                    .approvedAt(payment.getApprovedAt())
+                    .receiptUrl(payment.getReceiptUrl())
+                    .build();
+        }
+
+        return OrderDetailResponse.builder()
+                .orderId(order.getId())
+                .status(order.getStatus().name())
+                .totalAmount(order.getTotalAmount())
+                .shippingFee(order.getShippingFee())
+                .shippingName(order.getShippingName())
+                .shippingAddress(order.getShippingAddress())
+                .shippingMobile(order.getShippingMobile())
+                .shippingStatus(order.getShippingStatus().name())
+                .registeredAt(order.getRegisteredAt())
+
+                .payment(paymentInfo)
+
+                .items(order.getOrderItems().stream()
+                        .map(OrderItemResponse::fromEntity)
+                        .toList())
+                .build();
     }
+
 
 
     @Transactional
