@@ -1,7 +1,6 @@
 package org.example.stamppaw_backend.market.repository;
 
 import org.example.stamppaw_backend.market.entity.Order;
-import org.example.stamppaw_backend.market.entity.OrderItem;
 import org.example.stamppaw_backend.market.entity.OrderStatus;
 import org.example.stamppaw_backend.market.entity.ShippingStatus;
 import org.example.stamppaw_backend.market.repository.projection.OrderListRow;
@@ -13,7 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository  extends JpaRepository<Order, Long> {
@@ -32,6 +30,7 @@ public interface OrderRepository  extends JpaRepository<Order, Long> {
         FROM Order o
         JOIN o.user u
         WHERE (:status IS NULL OR o.status = :status)
+        Order by o.id DESC
     """)
     Page<OrderListRow> findAllSummaries(
             @Param("status") OrderStatus status,
@@ -49,9 +48,12 @@ public interface OrderRepository  extends JpaRepository<Order, Long> {
                o.shippingStatus AS shippingStatus,
                o.registeredAt AS registeredAt
         FROM Order o
-        WHERE o.user.id = :userId
+        WHERE o.user.id = :userId AND o.status = :orderStatus
+        Order by o.id DESC
     """)
-    Page<OrderListRow> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
+    Page<OrderListRow> findAllByUserIdAndStatus(@Param("userId") Long userId,
+                                       @Param("orderStatus") OrderStatus orderStatus,
+                                       Pageable pageable);
 
 
 
@@ -77,6 +79,7 @@ public interface OrderRepository  extends JpaRepository<Order, Long> {
         left join fetch oi.product p
         left join fetch o.payment pay
         where o.id = :orderId
+        Order by o.id DESC
     """)
     Optional<Order> findDetailByOrderId(@Param("orderId") Long orderId);
 

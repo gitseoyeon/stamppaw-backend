@@ -106,9 +106,19 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public Page<OrderResponse> getUserOrders(Long userId, Pageable pageable) {
+    public Page<OrderResponse> getUserOrders(Long userId, Pageable pageable, String orderStatus) {
 
-        Page<OrderListRow> orderPage = orderRepository.findAllByUserId(userId, pageable);
+        OrderStatus statusEnum = null;
+        if (orderStatus == null ||
+                orderStatus.isBlank() ||
+                orderStatus.equalsIgnoreCase("undefined")) {
+
+            statusEnum = OrderStatus.ORDER;
+        } else {
+            statusEnum = OrderStatus.valueOf(orderStatus.toUpperCase());
+        }
+
+        Page<OrderListRow> orderPage = orderRepository.findAllByUserIdAndStatus(userId, statusEnum, pageable);
 
         List<Long> orderIds = orderPage.getContent().stream()
                 .map(OrderListRow::getOrderId)
@@ -139,6 +149,45 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetailForAdmin(Long orderId) {
+
+        Order order = orderRepository.findDetailByOrderId(orderId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.ORDER_NOT_FOUND));
+
+        Payment payment = order.getPayment();
+        OrderDetailResponse.PaymentInfo paymentInfo = null;
+
+        if (payment != null) {
+            paymentInfo = OrderDetailResponse.PaymentInfo.builder()
+                    .paymentKey(payment.getPaymentKey())
+                    .status(payment.getStatus().name())
+                    .tossOrderId(payment.getTossOrderId())
+                    .method(payment.getMethod())
+                    .approvedAt(payment.getApprovedAt())
+                    .receiptUrl(payment.getReceiptUrl())
+                    .build();
+        }
+
+        return OrderDetailResponse.builder()
+                .orderId(order.getId())
+                .status(order.getStatus().name())
+                .totalAmount(order.getTotalAmount())
+                .shippingFee(order.getShippingFee())
+                .shippingName(order.getShippingName())
+                .shippingAddress(order.getShippingAddress())
+                .shippingMobile(order.getShippingMobile())
+                .shippingStatus(order.getShippingStatus().name())
+                .registeredAt(order.getRegisteredAt())
+
+                .payment(paymentInfo)
+
+                .items(order.getOrderItems().stream()
+                        .map(OrderItemResponse::fromEntity)
+                        .toList())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(Long userId, Long orderId) {
 
         Order order = orderRepository.findDetailByOrderId(orderId)
@@ -148,12 +197,13 @@ public class OrderService {
             throw new StampPawException(ErrorCode.UNAUTHORIZED_ORDER_ACCESS);
         }
 
-        // 결제 정보 매핑
         Payment payment = order.getPayment();
         OrderDetailResponse.PaymentInfo paymentInfo = null;
+
         if (payment != null) {
             paymentInfo = OrderDetailResponse.PaymentInfo.builder()
                     .paymentKey(payment.getPaymentKey())
+                    .status(payment.getStatus().name())
                     .tossOrderId(payment.getTossOrderId())
                     .method(payment.getMethod())
                     .approvedAt(payment.getApprovedAt())
@@ -201,4 +251,15 @@ public class OrderService {
 
         orderRepository.updateOrderStatus(orderId, status);
     }
+
+    @Transactional
+    public void deleteOrderForAdmin(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new StampPawException(ErrorCode.ORDER_NOT_FOUND));
+
+        // Order 삭제 → OrderItems + Payment 자동 삭제됨
+        orderRepository.delete(order);
+    }
+
 }

@@ -36,6 +36,7 @@ public class OrderDetailResponse {
     @AllArgsConstructor
     public static class PaymentInfo {
         private String paymentKey;
+        private String status;
         private String tossOrderId;
         private String method;
         private LocalDateTime approvedAt;

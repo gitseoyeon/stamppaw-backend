@@ -1,109 +1,177 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko"
-      th:replace="~{admin/layout :: layout('주문/결제 상세', ~{::content}, ~{::scripts})}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('주문 상세보기', ~{::content}, ~{::scripts})}">
+
 <body>
+
 <div th:fragment="content">
 
   <div class="page-header">
-    <h2>주문 상세</h2>
+    <h2>주문 상세보기</h2>
   </div>
 
-  <div style="margin: 0px 15px;">
-  <section class="card">
-    <div class="grid-2">
+  <!-- 주문 정보 -->
+  <div class="card">
+    <h3>주문 정보</h3>
 
-      <div>
-        <label>카테고리</label>
-        <span class="readonly-text" th:text="${product.category.label}"></span>
-      </div>
+    <table class="admin-table">
+      <tr>
+        <th>주문번호</th>
+        <td th:text="${detail.orderId}"></td>
+      </tr>
 
-      <div>
-        <label>상태</label>
-        <span class="readonly-text" th:text="${product.status}"></span>
-      </div>
+      <tr>
+        <th>주문상태</th>
+        <td th:text="${detail.status}"></td>
+      </tr>
 
-      <div>
-        <label>상품명</label>
-        <span class="readonly-text" th:text="${product.name}"></span>
-      </div>
+      <tr>
+        <th>총 결제금액</th>
+        <td>
+          상품 구매
+          <span th:text="${#numbers.formatInteger(detail.totalAmount, 3, 'COMMA')}"></span>
+          +
+          배송비
+          <span th:text="${#numbers.formatInteger(detail.shippingFee, 3, 'COMMA')}"></span>
+          =
+          합계
+          <span th:text="${#numbers.formatInteger(detail.totalAmount + detail.shippingFee, 3, 'COMMA')}"></span>
+          원
+        </td>
+      </tr>
 
-      <div>
-        <label>가격</label>
-        <span class="readonly-text" th:text="${product.price}"></span>
-      </div>
+      <tr>
+        <th>주문일</th>
+        <td th:text="${#temporals.format(detail.registeredAt, 'yyyy-MM-dd HH:mm')}"></td>
+      </tr>
+    </table>
 
-      <div class="col-span-2">
-        <label>대표 이미지</label>
-        <div>
-          <img th:src="${product.mainImageUrl}" style="max-width:80px; border-radius:6px;"/>
-        </div>
-      </div>
-
-      <div class="col-span-2">
-        <label>설명</label>
-        <div class="readonly-text multiline" th:text="${product.description}"></div>
-      </div>
-
+    <div class="actions">
+      <a th:if="${detail.status == 'ORDER'}"
+         th:href="@{'/admin/market/orders/' + ${detail.orderId} + '/cancel'}"
+         class="btn-third btn-small"
+         onclick="return confirm('정말 주문을 취소하시겠습니까?');">
+        주문 취소
+      </a>
     </div>
-  </section>
+  </div>
 
-  <section class="card">
-    <div class="section-title">
-      <h3>이미지</h3>
+  <!-- 배송 정보 -->
+  <div class="card">
+    <h3>배송 정보</h3>
+
+    <table class="admin-table">
+      <tr>
+        <th>배송상태</th>
+        <td th:text="${detail.shippingStatus}"></td>
+      </tr>
+
+      <tr>
+        <th>받는 사람</th>
+        <td th:text="${detail.shippingName}"></td>
+      </tr>
+
+      <tr>
+        <th>연락처</th>
+        <td th:text="${detail.shippingMobile}"></td>
+      </tr>
+
+      <tr>
+        <th>주소</th>
+        <td th:text="${detail.shippingAddress}"></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 결제 정보 -->
+  <div class="card">
+    <h3>결제 정보</h3>
+
+    <table class="admin-table">
+      <tr>
+        <th>결제 상태</th>
+        <td th:text="${detail.payment.status}"></td>
+      </tr>
+
+      <tr>
+        <th>토스 주문 번호</th>
+        <td th:text="${detail.payment.tossOrderId}"></td>
+      </tr>
+
+      <tr>
+        <th>결제수단</th>
+        <td th:text="${detail.payment.method}"></td>
+      </tr>
+
+      <tr>
+        <th>결제 승인일</th>
+        <td th:text="${#temporals.format(detail.payment.approvedAt, 'yyyy-MM-dd HH:mm')}"></td>
+      </tr>
+
+      <tr>
+        <th>영수증</th>
+        <td>
+          <a th:href="${detail.payment.receiptUrl}" target="_blank" class="btn-secondary btn-small">
+            영수증 보기
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div class="actions">
+
+      <a th:if="${detail.payment.status == 'DONE'}"
+         th:href="@{'/admin/market/orders/' + ${detail.orderId} + '/payment-cancel'}"
+         class="btn-secondary btn-small"
+         onclick="return confirm('정말 결제를 취소하시겠습니까?');">
+        결제 취소
+      </a>
     </div>
+  </div>
+
+  <!-- 주문 상품 목록 -->
+  <div class="card">
+    <h3>주문 상품</h3>
 
     <table class="admin-table">
       <thead>
       <tr>
-        <th>이미지</th>
-        <th>정렬</th>
+        <th>상품 이미지</th>
+        <th>상품명</th>
+        <th>옵션</th>
+        <th>수량</th>
+        <th>가격</th>
+        <th>소계</th>
       </tr>
       </thead>
+
       <tbody>
-      <tr th:each="img : ${product.images}">
+      <tr th:each="item : ${detail.items}">
         <td>
-          <img th:src="${img.imageUrl}" style="max-width:80px; border-radius:6px;"/>
+          <img th:src="${item.mainImageUrl}" style="width:60px; height:60px; object-fit:cover;">
         </td>
-        <td th:text="${img.sort}"></td>
+        <td th:text="${item.productName}"></td>
+        <td th:text="${item.optionSummary == '' ? '-' : item.optionSummary}"></td>
+        <td th:text="${item.quantity} + ' 개'"></td>
+        <td th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')} + ' 원'"></td>
+        <td th:text="${#numbers.formatInteger(item.subtotal, 3, 'COMMA')} + ' 원'"></td>
+      </tr>
+
+      <tr th:if="${#lists.isEmpty(detail.items)}">
+        <td colspan="6">상품 정보 없음</td>
       </tr>
       </tbody>
     </table>
-  </section>
-
-  <section class="card">
-    <div class="section-title">
-      <h3>옵션</h3>
-      <span class="hint">여러 값은 쉼표 구분</span>
-    </div>
-
-    <table class="admin-table">
-      <thead>
-      <tr><th>이름</th><th>값</th><th>추가금</th></tr>
-      </thead>
-      <tbody>
-      <tr th:each="opt : ${product.options}">
-        <td th:text="${opt.name}"></td>
-        <td th:text="${opt.value}"></td>
-        <td th:text="${opt.extraPrice}"></td>
-      </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <div class="actions">
-    <a th:href="@{'/admin/products/' + ${product.id} + '/edit'}" class="btn-primary btn-lg">수정</a>
-
-    <form th:action="@{'/admin/products/' + ${product.id} + '/delete'}"
-          method="post"
-          style="display:inline;">
-      <button type="submit" class="btn-primary btn-lg"
-              onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-    </form>
-
-    <a th:href="@{/admin/products}" class="btn-primary btn-lg">목록</a>
   </div>
+
+  <!-- 목록으로 -->
+  <div class="actions" style="margin-top: 30px;">
+    <a href="/admin/orders" class="btn-primary btn-lg">목록으로</a>
   </div>
+
 </div>
+
 <th:block th:fragment="scripts"></th:block>
+
 </body>
 </html>

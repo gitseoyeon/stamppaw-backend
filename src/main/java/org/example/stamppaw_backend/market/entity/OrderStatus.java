@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum OrderStatus {
     ORDER("주문"),
-    PAYED("결제 완료"),   // 결제 진행할때 업데이트, 고민중
-    CANCELED("주문 취소");
+    CANCELED("주문취소");
 
     private final String label;
 }
