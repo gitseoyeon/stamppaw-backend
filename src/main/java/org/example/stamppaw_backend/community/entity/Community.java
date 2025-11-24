@@ -8,6 +8,9 @@ import org.example.stamppaw_backend.community.dto.request.CommunityModifyRequest
 import org.example.stamppaw_backend.companion.entity.RecruitmentStatus;
 import org.example.stamppaw_backend.user.entity.User;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "community")
 @Getter
@@ -33,6 +36,14 @@ public class Community extends BasicTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Like> likes = new HashSet<>();
+
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Comment> comments = new HashSet<>();
 
     @Override
     public void setPrePersist() {

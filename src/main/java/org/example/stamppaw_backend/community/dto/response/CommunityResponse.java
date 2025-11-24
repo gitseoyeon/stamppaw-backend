@@ -20,6 +20,9 @@ public class CommunityResponse {
     private String imageUrl;
     private Long views;
     private LocalDateTime registeredAt;
+    private Long likeCount;
+    private boolean isLiked;
+    private Long commentCount;
     private UserDto user;
 
     public static CommunityResponse from(Community community) {
@@ -34,13 +37,15 @@ public class CommunityResponse {
                 .build();
     }
 
-    public static CommunityResponse fromEntity(Community community, Long totalViews) {
+    public static CommunityResponse fromEntity(Community community, Long totalViews, Long likeCount, boolean isLiked) {
         return CommunityResponse.builder()
                 .id(community.getId())
                 .title(community.getTitle())
                 .content(community.getContent())
                 .imageUrl(community.getImageUrl())
                 .views(totalViews)
+                .likeCount(likeCount)
+                .isLiked(isLiked)
                 .registeredAt(community.getRegisteredAt())
                 .user(UserDto.fromEntity(community.getUser()))
                 .build();

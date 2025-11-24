@@ -61,8 +61,8 @@ public class CompanionController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deleteCompanion(@PathVariable Long postId, @AuthenticationPrincipal User user) {
-        companionService.deleteCompanion(postId, user.getId());
+    public ResponseEntity<String> deleteCompanion(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        companionService.deleteCompanion(postId, userDetails.getUser().getId());
         return ResponseEntity.ok("삭제가 완료되었습니다.");
     }
 

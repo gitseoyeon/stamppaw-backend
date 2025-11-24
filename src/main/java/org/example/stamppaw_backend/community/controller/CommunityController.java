@@ -7,6 +7,7 @@ import org.example.stamppaw_backend.community.dto.request.CommunityCreateRequest
 import org.example.stamppaw_backend.community.dto.request.CommunityModifyRequest;
 import org.example.stamppaw_backend.community.dto.response.CommunityResponse;
 import org.example.stamppaw_backend.community.service.CommunityService;
+import org.example.stamppaw_backend.community.service.LikeService;
 import org.example.stamppaw_backend.user.service.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,11 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/community")
 public class CommunityController {
     private final CommunityService communityService;
+    private final LikeService likeService;
 
     @PostMapping
     public ResponseEntity<String> createCommunity(@Valid CommunityCreateRequest request,
@@ -36,9 +40,12 @@ public class CommunityController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommunityResponse> getCommunity (@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<CommunityResponse> getCommunity (@PathVariable Long id, HttpServletRequest request,
+                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long userId = (userDetails != null) ? userDetails.getUser().getId() : null;
         return ResponseEntity.ok(
-                communityService.getCommunity(id, request)
+                communityService.getCommunity(id, request, userId)
         );
     }
 
@@ -54,5 +61,16 @@ public class CommunityController {
     public ResponseEntity<String> deleteCommunity(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
         communityService.deleteCommunity(id, userDetails.getUser().getId());
         return ResponseEntity.ok("삭제가 완료 되었습니다.");
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        boolean isLiked = communityService.toggleLike(id, userDetails.getUser().getId());
+        Long likeCount = likeService.getLikeCount(id);
+
+        return ResponseEntity.ok().body(Map.of(
+                "isLiked", isLiked,
+                "likeCount", likeCount
+        ));
     }
 }
