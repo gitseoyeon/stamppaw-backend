@@ -13,4 +13,7 @@ public interface CompanionRepository extends JpaRepository<Companion, Long> {
 
     @Query("select c from Companion c order by c.registeredAt desc ")
     Page<Companion> findAllOrderByregisteredAt(Pageable pageable);
+
+    @Query("SELECT c from Companion c WHERE c.title LIKE %:title% ORDER BY c.registeredAt desc ")
+    Page<Companion> findByTitle(Pageable pageable, String title);
 }

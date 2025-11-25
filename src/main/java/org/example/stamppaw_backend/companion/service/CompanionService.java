@@ -120,6 +120,12 @@ public class CompanionService {
         companion.updateStatus(status);
     }
 
+    @Transactional(readOnly = true)
+    public Page<CompanionResponse> searchCompanions (Pageable pageable, String title) {
+        Page<Companion> companions = companionRepository.findByTitle(pageable, title);
+        return companions.map(CompanionResponse::fromEntity);
+    }
+
     private Companion getCompanionOrException(Long postId) {
         return companionRepository.findById(postId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.COMPANION_NOT_FOUND));
