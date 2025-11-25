@@ -50,6 +50,6 @@ public class AdminOrderController {
 
         orderService.deleteOrderForAdmin(orderId);
 
-        return "admin/market/order-list";
+        return "redirect:admin/market/orders";
     }
 }

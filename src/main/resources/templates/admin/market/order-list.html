@@ -8,19 +8,14 @@
     <h2>주문/결제 목록</h2>
   </div>
 
-  <!-- 주문 상태 필터 -->
   <form th:action="@{/admin/orders}" method="get"
         class="search-form"
         style="display:flex; align-items:center; gap:10px; margin: 0 15px 20px;">
-
-    <!-- 라벨 -->
     <label for="status" style="font-weight:600; font-size:14px;">
       주문상태
     </label>
-
-    <!-- select 박스 -->
     <select id="status" name="status"
-            style="padding:6px 10px; border:1px solid #ccc; border-radius:6px; width:150px;">
+            style="height:40px; padding:6px 10px; border:1px solid #ccc; border-radius:6px; width:150px;">
       <option th:value="${null}"
               th:selected="${selectedStatus == null}">
         전체
@@ -31,20 +26,17 @@
               th:text="${st}">
       </option>
     </select>
-
-    <!-- 검색 버튼 -->
     <button class="btn btn-primary"
             style="padding:6px 14px; height:36px;">
       검색
     </button>
   </form>
 
-
   <div style="margin: 0px 15px;">
     <table class="admin-table">
       <thead>
       <tr>
-        <th>주문번호</th>
+        <th>ID</th>
         <th>주문자</th>
         <th>총 금액</th>
         <th>주문일</th>
@@ -71,17 +63,21 @@
         <td th:text="${order.status}"></td>
         <td th:text="${order.shippingStatus}"></td>
         <td>
-          <a th:href="@{'/admin/orders/' + ${order.orderId}}" class="btn btn-primary btn-sm">
-            상세보기
-          </a>
+          <div style="display:flex; gap:8px; justify-content:center;">
+            <a th:href="@{'/admin/orders/' + ${order.orderId}}" class="btn btn-primary btn-sm">
+              상세보기
+            </a>
 
-          <!--form th:action="@{'/admin/orders/' + ${order.orderId} + '/delete'}" method="post">
-            <button type="submit" class="btn btn-primary btn-sm"
-                    onclick="return confirm('정말 삭제하시겠습니까?');">
-              삭제
-            </button>
-          </form-->
+            <form th:action="@{'/admin/orders/' + ${order.orderId} + '/delete'}"
+                  method="post">
+              <button type="submit" class="btn btn-third btn-sm"
+                      onclick="return confirm('정말 삭제하시겠습니까?');">
+                삭제
+              </button>
+            </form>
+          </div>
         </td>
+
 
       </tr>
 
