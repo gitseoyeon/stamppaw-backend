@@ -2,6 +2,8 @@ package org.example.stamppaw_backend.walk.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.stamppaw_backend.badge.service.UserBadgeService;
+import org.example.stamppaw_backend.badge.service.UserScoreService;
 import org.example.stamppaw_backend.common.S3Service;
 import org.example.stamppaw_backend.common.exception.ErrorCode;
 import org.example.stamppaw_backend.common.exception.StampPawException;
@@ -13,6 +15,7 @@ import org.example.stamppaw_backend.walk.entity.*;
 import org.example.stamppaw_backend.walk.repository.WalkPointRepository;
 import org.example.stamppaw_backend.walk.repository.WalkRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +35,15 @@ public class WalkService {
     private final WalkMapService walkMapService;
     private final S3Service s3Service;
     private final MissionProcessor missionProcessor;
+    private final UserBadgeService userBadgeService;
+    private final UserScoreService userScoreService;
 
-
+    public Page<Walk> search(WalkSearchRequest req) {
+        return walkRepository.searchByKeyword(
+                req.getKeyword(),
+                PageRequest.of(req.getPage(), req.getSize())
+        );
+    }
 
     @Transactional
     public WalkStartResponse startWalk(WalkStartRequest request, User currentUser) {
@@ -57,9 +67,14 @@ public class WalkService {
     }
 
     @Transactional
-    public WalkEndResponse endWalk(Long walkId, WalkEndRequest request) {
+    public WalkEndResponse endWalk(Long walkId, WalkEndRequest request, User currentUser) {
+
         Walk walk = walkRepository.findById(walkId)
                 .orElseThrow(() -> new StampPawException(ErrorCode.WALK_NOT_FOUND));
+
+        if (!walk.getUser().getId().equals(currentUser.getId())) {
+            throw new StampPawException(ErrorCode.UNAUTHORIZED_WALK);
+        }
 
         if (walk.getStatus() != WalkStatus.STARTED) {
             throw new StampPawException(ErrorCode.INVALID_WALK_STATUS);
@@ -82,15 +97,36 @@ public class WalkService {
         walk.setDistance(totalDistance);
 
         if (walk.getStartTime() != null && walk.getEndTime() != null) {
-            long duration = Duration.between(walk.getStartTime(), walk.getEndTime()).getSeconds();
-            walk.setDuration(duration);
+            long durationSeconds = Duration.between(walk.getStartTime(), walk.getEndTime()).getSeconds();
+            walk.setDuration(durationSeconds);
         }
 
+
+
+        // 스코어 반영
+        double distanceMeters = walk.getDistance();
+        long durationMinutes = walk.getDuration()/60;    // 60 으로 분 단위
+        boolean hasPhoto = (walk.getPhotos() != null && !walk.getPhotos().isEmpty());
+        boolean hasMemo = (walk.getMemo() != null && !walk.getMemo().isBlank());
+
+        userScoreService.applyWalkCompleted(
+                currentUser,
+                distanceMeters,
+                durationMinutes,
+                hasPhoto,
+                hasMemo,
+                walk.getStartTime()
+        );
+
         walkRepository.save(walk);
+
+        // 미션 평가 / 뱃지 평가
         missionProcessor.handleWalkCompleted(walk);
+        userBadgeService.evaluateBadges(currentUser);
 
         return WalkEndResponse.fromEntity(walk);
     }
+
 
     @Transactional
     public WalkResponse editWalk(Long walkId, WalkRecordRequest request, User currentUser) {
@@ -98,7 +134,7 @@ public class WalkService {
                 .orElseThrow(() -> new StampPawException(ErrorCode.WALK_NOT_FOUND));
 
         if (!walk.getUser().getId().equals(currentUser.getId())) {
-            throw new StampPawException(ErrorCode.UNAUTHORIZED_WALK_EDIT);
+            throw new StampPawException(ErrorCode.UNAUTHORIZED_WALK);
         }
 
         Optional.ofNullable(request.getMemo())
@@ -119,6 +155,9 @@ public class WalkService {
 
         walk.setStatus(WalkStatus.RECORDED);
         walkRepository.save(walk);
+
+        boolean hasPhoto = (walk.getPhotos() != null && !walk.getPhotos().isEmpty());
+        userScoreService.applyWalkCompleted(currentUser, hasPhoto);
 
         return buildWalkResponse(walk);
     }

@@ -6,7 +6,6 @@ import org.example.stamppaw_backend.user.entity.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +29,12 @@ public class Walk {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Long duration;
+    private Double distance;
 
     private Double startLat;
     private Double startLng;
     private Double endLat;
     private Double endLng;
-    private Double distance;
 
     @OneToMany(mappedBy = "walk", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

@@ -49,7 +49,7 @@ public enum ErrorCode {
 
     // Walk
     WALK_NOT_FOUND(HttpStatus.NOT_FOUND, "산책 기록을 찾을 수 없습니다."),
-    UNAUTHORIZED_WALK_EDIT(HttpStatus.FORBIDDEN, "본인의 산책 기록만 수정할 수 있습니다."),
+    UNAUTHORIZED_WALK(HttpStatus.FORBIDDEN, "본인의 산책 기록만 저장할 수 있습니다."),
     UNAUTHORIZED_WALK_DELETE(HttpStatus.FORBIDDEN, "본인의 산책 기록만 삭제할 수 있습니다."),
     UNAUTHORIZED_WALK_ACCESS(HttpStatus.FORBIDDEN, "본인의 산책 기록만 조회할 수 있습니다."),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "요청값이 올바르지 않습니다."),
@@ -57,10 +57,15 @@ public enum ErrorCode {
 
     // Mission
     MISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "미션을 찾을 수 없습니다."),
-    MISSION_ALREADY_COMPLETED(HttpStatus.NOT_FOUND, "이미 완료된 미션입니다."),
+    MISSION_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료된 미션입니다."),
     INVALID_MISSION_TYPE(HttpStatus.NOT_FOUND, "미션 유형을 찾을 수 없습니다."),
-    MISSION_ALREADY_EXISTS(HttpStatus.NOT_FOUND, "미션타입 당 하나만 작성 가능합니다."),
-    INVALID_MISSION_TYPE_CHANGE(HttpStatus.NOT_FOUND, "미션타입은 변경할 수 없습니다."),
+    MISSION_ALREADY_EXISTS(HttpStatus.FORBIDDEN, "미션타입 당 하나만 작성 가능합니다."),
+    INVALID_MISSION_TYPE_CHANGE(HttpStatus.FORBIDDEN, "미션타입은 변경할 수 없습니다."),
+
+    //Badge
+    BADGE_NOT_FOUND(HttpStatus.NOT_FOUND, "뱃지를 찾을 수 없습니다."),
+    BADGE_RULE_MISSING_TIME_RANGE(HttpStatus.BAD_REQUEST, "시작 및 종료 시간이 올바르지 않습니다."),
+    BADGE_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "뱃지 룰을 찾을 수 없습니다."),
 
     // Point
     POINT_NOT_FOUND(HttpStatus.NOT_FOUND, "포인트를 찾을 수 없습니다."),
@@ -82,8 +87,7 @@ public enum ErrorCode {
     // AUTH / TOKEN
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
-    WEBSOCKET_AUTH_FAILED(HttpStatus.UNAUTHORIZED, "WebSocket 인증에 실패했습니다.")
-    ;
+    WEBSOCKET_AUTH_FAILED(HttpStatus.UNAUTHORIZED, "WebSocket 인증에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
