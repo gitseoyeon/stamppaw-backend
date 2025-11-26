@@ -163,6 +163,12 @@ public class PartTimeService {
         return applies.map(PartTimeUserApplyResponse::from);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PartTimeResponse> searchPartTimes(Pageable pageable, String title) {
+        Page<PartTime> results = partTimeRepository.findByTitle(pageable, title);
+        return results.map(PartTimeResponse::fromEntity);
+    }
+
 
 
 }

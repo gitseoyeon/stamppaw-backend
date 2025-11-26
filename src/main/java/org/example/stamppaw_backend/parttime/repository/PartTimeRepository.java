@@ -13,4 +13,8 @@ public interface PartTimeRepository extends JpaRepository<PartTime, Long> {
 
     @Query("select p from PartTime p order by p.registeredAt desc ")
     Page<PartTime> findAllOrderByregisteredAt(Pageable pageable);
+
+    @Query("SELECT p FROM PartTime p WHERE p.title LIKE %:title% ORDER BY p.registeredAt DESC")
+    Page<PartTime> findByTitle(Pageable pageable, String title);
+
 }

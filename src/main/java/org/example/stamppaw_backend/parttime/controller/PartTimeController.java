@@ -129,4 +129,14 @@ public class PartTimeController {
         return ResponseEntity.ok(partTimeService.getUserApply(pageable, user.getId()));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<PartTimeResponse>> searchPartTime(
+        @RequestParam(value = "title", defaultValue = "") String title,
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "3") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(partTimeService.searchPartTimes(pageable, title));
+    }
+
 }
