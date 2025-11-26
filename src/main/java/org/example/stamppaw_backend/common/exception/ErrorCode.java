@@ -74,6 +74,11 @@ public enum ErrorCode {
     FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 파일 업로드에 실패했습니다."),
     FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 삭제를 실패했습니다."),
 
+    //PartTime
+    PARTTIME_NOT_FOUND(HttpStatus.NOT_FOUND, "파트타임 게시글을 찾을 수 없습니다."),
+    PARTTIME_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "알바 지원 내역을 찾을 수 없습니다."),
+    ALREADY_PARTTIME_APPLICANT(HttpStatus.BAD_REQUEST, "이미 지원한 사용자입니다."),
+
     // AUTH / TOKEN
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
