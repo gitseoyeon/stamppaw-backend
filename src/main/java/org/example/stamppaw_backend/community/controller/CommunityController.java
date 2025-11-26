@@ -49,6 +49,14 @@ public class CommunityController {
         );
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<Page<CommunityResponse>> getUserCommunity(@RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "5") int size,
+                                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(communityService.getUserCommunity(pageable, userDetails.getUser().getId()));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<String> modifyCommunity(@PathVariable Long id,
                                                   @Valid CommunityModifyRequest request,

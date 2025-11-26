@@ -64,6 +64,12 @@ public class CommunityService {
         return CommunityResponse.fromEntity(community, total, likeCount, isLiked);
     }
 
+    public Page<CommunityResponse> getUserCommunity(Pageable pageable, Long userId) {
+        User user = userService.getUserOrException(userId);
+        Page<Community> communities = communityRepository.findByUser(pageable, user);
+        return mapToCommunity(communities);
+    }
+
     public void modifyCommunity(Long id, CommunityModifyRequest request, Long userId) {
         User user = userService.getUserOrException(userId);
         Community community = getCommunityOrException(id);

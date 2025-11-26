@@ -7,6 +7,7 @@ import org.example.stamppaw_backend.user.entity.User;
 import org.example.stamppaw_backend.user.service.CustomUserDetails;
 import org.example.stamppaw_backend.walk.dto.request.*;
 import org.example.stamppaw_backend.walk.dto.response.*;
+import org.example.stamppaw_backend.walk.entity.Walk;
 import org.example.stamppaw_backend.walk.service.WalkMapService;
 import org.example.stamppaw_backend.walk.service.WalkService;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,18 @@ public class WalkController {
 
     private final WalkService walkService;
     private final WalkMapService walkMapService;
+
+    @GetMapping("/search")
+    public Page<WalkSearchResponse> search(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @RequestParam(required = false) String memo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Long userId = currentUser.getUser().getId();
+        Page<Walk> result = walkService.search(userId, memo, page, size);
+        return result.map(WalkSearchResponse::fromEntity);
+    }
 
     @GetMapping("/my")
     public Page<WalkResponse> getMyWalks(
@@ -72,7 +85,7 @@ public class WalkController {
             @RequestBody WalkEndRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
-        WalkEndResponse response = walkService.endWalk(walkId, request);
+        WalkEndResponse response = walkService.endWalk(walkId, request, currentUser.getUser());
         return ResponseEntity.ok(response);
     }
 
