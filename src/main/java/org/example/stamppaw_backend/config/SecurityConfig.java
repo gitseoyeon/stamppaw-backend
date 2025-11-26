@@ -31,13 +31,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
+
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/companion/**", "/api/community/**").permitAll()
                         .requestMatchers("/api/market/products/**", "/api/payment/**").permitAll()
                         .requestMatchers("/admin/**").permitAll() // 관리자 임시허용
                         .requestMatchers("/ws-stomp/**", "/ws-stomp").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/companion/**", "/api/community/**", "/api/parttime/**").permitAll()
-                    .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/follows/**").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
