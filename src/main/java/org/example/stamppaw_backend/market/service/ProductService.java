@@ -119,7 +119,7 @@ public class ProductService {
 
         String keyword = (name == null || name.isBlank()) ? "" : name.trim();
 
-        return productRepository.findByStatusAndNameContainingIgnoreCaseOrderByIdDesc(
+        return productRepository.findByNameOrDescription(
                 ProductStatus.SERVICE,
                 keyword,
                 pageable

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class ProductSearchRequest
 {
-    private String keyword;
+    private String title;
     private int page = 0;
-    private int size = 10;
+    private int size = 3;
 }

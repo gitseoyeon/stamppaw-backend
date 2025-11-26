@@ -6,6 +6,7 @@ import org.example.stamppaw_backend.market.dto.request.ProductSearchRequest;
 import org.example.stamppaw_backend.market.dto.response.CategoryResponse;
 import org.example.stamppaw_backend.market.dto.response.ProductDetailResponse;
 import org.example.stamppaw_backend.market.dto.response.ProductListResponse;
+import org.example.stamppaw_backend.market.dto.response.ProductSearchResponse;
 import org.example.stamppaw_backend.market.entity.Category;
 import org.example.stamppaw_backend.market.repository.projection.ProductListRow;
 import org.example.stamppaw_backend.market.service.ProductService;
@@ -24,8 +25,15 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/products/search")
-    public Page<ProductListRow> searchProducts(@RequestBody ProductSearchRequest req) {
-        return productService.getProductSearch(req.getKeyword(), req.getPage(), req.getSize());
+    public Page<ProductSearchResponse> searchProducts(@RequestBody ProductSearchRequest req) {
+        Page<ProductListRow> result = productService.getProductSearch(req.getTitle(), req.getPage(), req.getSize());
+
+        return result.map(p -> new ProductSearchResponse(
+                p.getId(),
+                p.getName(),
+                p.getDescription(),
+                p.getMainImageUrl()
+        ));
     }
 
     @GetMapping("/products/latest")
