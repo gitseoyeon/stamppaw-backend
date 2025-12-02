@@ -90,5 +90,5 @@
 |<img width=150 src="https://avatars.githubusercontent.com/u/126096318?v=4" />|<img width=150 src="https://avatars.githubusercontent.com/u/111329305?v=4" />|<img width=150 src="https://avatars.githubusercontent.com/u/134049793?v=4" />|<img width=150 src="https://avatars.githubusercontent.com/u/201212667?v=4" />|
 |:----:|:----:|:----:|:----:|
 | [민서연](https://github.com/gitseoyeon) | [김푸름](https://github.com/kimpooreum) | [이은정](https://github.com/ejleeBigData) | [정주영](https://github.com/juyoung797) |
-| 팀장•FE•BE | FE•BE | FE•BE | FE•BE |
+| 팀장•FE•BE•Infra | FE•BE | FE•BE | FE•BE |
 | 산책 동행 및 일반 커뮤니티 | 회원 관리 및 아르바이트 | 마켓 관리 및 결제 | 산책 및 미션, 뱃지 |
